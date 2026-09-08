@@ -178,21 +178,25 @@ function renderDistrict(key) {
   pill.innerHTML = `<span class="label">${d.pill.label}</span><strong>${d.pill.text}</strong>`;
 
   const alert = $("#alertStrip");
+  const alertCta = $(".alert-cta");
   if (d.levelClass === "safe") {
     alert.style.background = "linear-gradient(105deg, rgba(62,207,142,0.18), rgba(62,207,142,0.06))";
     alert.style.borderColor = "rgba(62,207,142,0.35)";
     $(".alert-icon").style.background = "#3ecf8e";
-    $(".alert-cta").style.background = "#2f9f86";
+    alertCta.style.background = "#2f9f86";
+    alertCta.textContent = "View";
   } else if (d.levelClass === "watch") {
     alert.style.background = "linear-gradient(105deg, rgba(245,197,66,0.2), rgba(245,197,66,0.06))";
     alert.style.borderColor = "rgba(245,197,66,0.4)";
     $(".alert-icon").style.background = "#f5c542";
-    $(".alert-cta").style.background = "#c9971f";
+    alertCta.style.background = "#c9971f";
+    alertCta.textContent = "Review";
   } else {
     alert.style.background = "";
     alert.style.borderColor = "";
     $(".alert-icon").style.background = "";
-    $(".alert-cta").style.background = "";
+    alertCta.style.background = "";
+    alertCta.textContent = "Act";
   }
 
   $("#zoneCount").textContent = `${d.zones.filter((z) => z.tone !== "green").length} active`;
@@ -234,7 +238,7 @@ function toast(message) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => {
     el.classList.remove("show");
-  }, 2400);
+  }, 3200);
 }
 
 function setupLayers() {

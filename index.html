@@ -103,15 +103,15 @@
                     <stop offset="100%" stop-color="#142230"/>
                   </linearGradient>
                   <radialGradient id="riskRed" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".55"/>
+                    <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".72"/>
                     <stop offset="100%" stop-color="#FF4D4D" stop-opacity="0"/>
                   </radialGradient>
                   <radialGradient id="riskAmber" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#F5C542" stop-opacity=".45"/>
+                    <stop offset="0%" stop-color="#F5C542" stop-opacity=".58"/>
                     <stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
                   </radialGradient>
                   <radialGradient id="riskGreen" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#3ECF8E" stop-opacity=".35"/>
+                    <stop offset="0%" stop-color="#3ECF8E" stop-opacity=".48"/>
                     <stop offset="100%" stop-color="#3ECF8E" stop-opacity="0"/>
                   </radialGradient>
                   <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -126,10 +126,11 @@
 
                 <!-- Risk zones -->
                 <g class="zones layer-risk">
-                  <ellipse class="zone zone-red" cx="168" cy="148" rx="48" ry="34" fill="url(#riskRed)"/>
-                  <ellipse class="zone zone-amber" cx="250" cy="168" rx="42" ry="30" fill="url(#riskAmber)"/>
-                  <ellipse class="zone zone-green" cx="95" cy="195" rx="38" ry="28" fill="url(#riskGreen)"/>
-                  <ellipse class="zone zone-amber" cx="300" cy="128" rx="30" ry="22" fill="url(#riskAmber)"/>
+                  <ellipse class="zone zone-red" cx="168" cy="148" rx="56" ry="40" fill="url(#riskRed)"/>
+                  <ellipse class="zone zone-amber" cx="250" cy="168" rx="48" ry="34" fill="url(#riskAmber)"/>
+                  <ellipse class="zone zone-green" cx="95" cy="195" rx="42" ry="32" fill="url(#riskGreen)"/>
+                  <ellipse class="zone zone-amber" cx="300" cy="128" rx="34" ry="26" fill="url(#riskAmber)"/>
+                  <path class="zone-outline" d="M140 130 C155 118 185 118 198 138 C208 155 195 175 168 178 C145 180 130 155 140 130Z" fill="none" stroke="#FF4D4D" stroke-opacity=".55" stroke-width="1.5"/>
                 </g>
 
                 <!-- Evacuation routes -->

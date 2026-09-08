@@ -121,9 +121,9 @@ button, select {
 
 .stage-notes p {
   margin: 0;
-  color: var(--faint);
-  font-size: 0.78rem;
-  line-height: 1.55;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
 }
 
 /* ===== Device frame ===== */
@@ -428,7 +428,7 @@ button, select {
 
 .map-toggles {
   display: flex;
-  gap: 4px;
+  gap: 8px;
 }
 
 .chip {
@@ -437,7 +437,7 @@ button, select {
   color: var(--muted);
   font-size: 0.68rem;
   font-weight: 600;
-  padding: 5px 9px;
+  padding: 6px 10px;
   border-radius: 999px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
