@@ -157,9 +157,9 @@ const DEFAULT_ADMIN = {
   sirenArmed: true,
   operatorId: "op-1",
   officers: [
-    { id: "op-1", name: "Sample Controller", role: "ASDMA Controller (sample)" },
-    { id: "op-2", name: "Sample District Officer", role: "District Officer · Kamrup Metro (sample)" },
-    { id: "op-3", name: "Sample Field Lead", role: "Field Lead · Karbi Anglong (sample)" },
+    { id: "op-1", name: "ASDMA Controller", role: "Demo controller account" },
+    { id: "op-2", name: "District Officer", role: "Demo · Kamrup Metro" },
+    { id: "op-3", name: "Field Lead", role: "Demo · Karbi Anglong" },
   ],
   maintenance: {},
   archive: [],
@@ -749,7 +749,7 @@ function syncAuthUI() {
   const tabbar = $(".tabbar");
   if (state.authed) {
     const op = currentOperator();
-    btn.textContent = `Sign out · ${op.name.split(" ")[0]}`;
+    btn.textContent = `Sign out · ${op.name}`;
     btn.classList.add("signed-in");
     btn.title = `Signed in as ${op.name}`;
     adminTab.hidden = false;

@@ -1092,6 +1092,10 @@ button, select { font: inherit; color: inherit; }
   grid-template-columns: repeat(5, 1fr);
 }
 
+.tab[hidden] {
+  display: none !important;
+}
+
 .tab {
   border: 0;
   background: transparent;
