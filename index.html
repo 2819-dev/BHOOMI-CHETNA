@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#070b14" />
-  <meta name="description" content="BHOOMI CHETNA — AI-powered landslide early warning system for Assam (ASDMA)." />
-  <title>BHOOMI CHETNA — Landslide Early Warning</title>
+  <meta name="theme-color" content="#0b1017" />
+  <meta name="description" content="BHOOMI CHETNA landslide early warning system for Assam State Disaster Management Authority." />
+  <title>BHOOMI CHETNA | Landslide Early Warning</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -20,12 +20,12 @@
           <svg viewBox="0 0 40 40" fill="none">
             <path d="M20 4L34 12V28L20 36L6 28V12L20 4Z" stroke="currentColor" stroke-width="1.6"/>
             <path d="M20 12L28 16.5V25.5L20 30L12 25.5V16.5L20 12Z" fill="currentColor" opacity=".18"/>
-            <circle cx="20" cy="21" r="3.2" fill="#3ECF8E"/>
+            <circle cx="20" cy="21" r="3.2" fill="#2F9E6B"/>
           </svg>
         </div>
         <div>
           <h1>BHOOMI CHETNA</h1>
-          <p class="live-line"><span class="pulse"></span> Live Monitoring · ASDMA</p>
+          <p class="live-line"><span class="status-dot"></span> Live feed · ASDMA</p>
         </div>
       </div>
 
@@ -63,8 +63,8 @@
         <div class="alert-strip" id="alertStrip" role="alert">
           <div class="alert-icon" aria-hidden="true">!</div>
           <div>
-            <strong id="alertTitle"></strong>
-            <p id="alertCopy"></p>
+            <strong id="alertTitle">HIGH RISK ALERT · Guwahati Hills</strong>
+            <p id="alertCopy">Model indicates rising slope failure probability. Evacuate Zone R-2 Chandmari.</p>
           </div>
           <button class="alert-cta" type="button" id="viewAlert">Act</button>
         </div>
@@ -86,43 +86,43 @@
             <article class="card risk-card">
               <p class="card-label">Landslide Risk Score</p>
               <div class="score-row">
-                <div class="score-ring" id="scoreRing" style="--p:0"><strong id="scoreValue">—</strong></div>
+                <div class="score-ring" id="scoreRing" style="--p:78"><strong id="scoreValue">78</strong></div>
                 <div>
-                  <p class="level" id="riskLevel"></p>
-                  <p class="meta" id="riskMeta"></p>
+                  <p class="level high" id="riskLevel">HIGH RISK</p>
+                  <p class="meta" id="riskMeta">Confidence 91% · Updated just now</p>
                 </div>
               </div>
             </article>
 
             <article class="card ai-card">
-              <p class="card-label">AI Prediction</p>
-              <p class="ai-headline" id="aiHeadline"></p>
-              <p class="meta" id="aiMeta"></p>
-              <div class="ai-bar"><span id="aiBarFill"></span></div>
+              <p class="card-label">Model Prediction</p>
+              <p class="ai-headline" id="aiHeadline">Slope instability rising</p>
+              <p class="meta" id="aiMeta">Estimated failure window: 6 to 12 hours</p>
+              <div class="ai-bar"><span id="aiBarFill" style="width:78%"></span></div>
             </article>
 
             <div class="grid-2">
               <article class="card">
                 <p class="card-label">Rainfall</p>
-                <p class="metric"><span id="rainValue">—</span><small>mm / 24h</small></p>
+                <p class="metric"><span id="rainValue">86</span><small>mm / 24h</small></p>
                 <div class="mini-chart" id="rainChart" aria-hidden="true"></div>
-                <p class="meta" id="rainMeta"></p>
+                <p class="meta warn-text" id="rainMeta">Above threshold (65 mm)</p>
               </article>
               <article class="card">
                 <p class="card-label">Soil Moisture</p>
-                <p class="metric"><span id="soilValue">—</span><small>%</small></p>
+                <p class="metric"><span id="soilValue">74</span><small>%</small></p>
                 <div class="gauge">
-                  <div class="gauge-track"><div class="gauge-fill" id="soilFill"></div></div>
+                  <div class="gauge-track"><div class="gauge-fill" id="soilFill" style="width:74%"></div></div>
                   <div class="gauge-marks"><span>0</span><span>50</span><span>100</span></div>
                 </div>
-                <p class="meta" id="soilMeta"></p>
+                <p class="meta warn-text" id="soilMeta">Saturation critical</p>
               </article>
             </div>
 
             <article class="card">
               <div class="card-head">
                 <p class="card-label">High-Risk Zones</p>
-                <span class="count-pill" id="zoneCount"></span>
+                <span class="count-pill" id="zoneCount">3 active</span>
               </div>
               <ul class="zone-list" id="zoneList"></ul>
             </article>
@@ -178,7 +178,7 @@
         <div class="card">
           <div class="card-head">
             <p class="card-label">IoT Sensor Network</p>
-            <span class="live-tag"><span class="pulse"></span> Real-time</span>
+            <span class="live-tag"><span class="status-dot"></span> Telemetry live</span>
           </div>
           <div class="sensor-summary" id="sensorSummary"></div>
           <div class="sensor-grid sensor-grid-lg" id="sensorGrid"></div>

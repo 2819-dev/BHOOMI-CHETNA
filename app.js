@@ -3,8 +3,8 @@ const DISTRICT_DATA = {
     name: "Guwahati Hills",
     score: 78,
     confidence: 91,
-    aiHeadline: "Slope instability rising",
-    aiMeta: "Failure window: 6–12 hours",
+    aiHeadline: "Slope instability rising on Chandmari corridor",
+    aiMeta: "Estimated failure window: 6 to 12 hours",
     rain: 86,
     rainSeries: [28, 42, 55, 48, 70, 88, 76],
     soil: 74,
@@ -39,8 +39,8 @@ const DISTRICT_DATA = {
     name: "Dima Hasao",
     score: 61,
     confidence: 87,
-    aiHeadline: "Moisture-driven risk elevated",
-    aiMeta: "Escalate if rainfall exceeds 40 mm",
+    aiHeadline: "Soil saturation elevating cut-slope risk",
+    aiMeta: "Escalate if 24h rainfall exceeds 40 mm",
     rain: 58,
     rainSeries: [22, 30, 36, 41, 49, 55, 58],
     soil: 66,
@@ -73,8 +73,8 @@ const DISTRICT_DATA = {
     name: "Cachar",
     score: 34,
     confidence: 94,
-    aiHeadline: "Conditions within safe band",
-    aiMeta: "Next model refresh in 15 min",
+    aiHeadline: "No critical displacement detected",
+    aiMeta: "Next model cycle in 15 minutes",
     rain: 28,
     rainSeries: [18, 22, 20, 25, 24, 30, 28],
     soil: 41,
@@ -107,8 +107,8 @@ const DISTRICT_DATA = {
     name: "Karbi Anglong",
     score: 82,
     confidence: 89,
-    aiHeadline: "Cascading failure probability high",
-    aiMeta: "Failure window: 4–10 hours",
+    aiHeadline: "Cascading failure risk on Diphu scarp",
+    aiMeta: "Estimated failure window: 4 to 10 hours",
     rain: 94,
     rainSeries: [40, 52, 61, 70, 78, 90, 94],
     soil: 81,
@@ -161,9 +161,9 @@ function levelFromScore(score) {
 }
 
 function riskColor(score) {
-  if (score >= 70) return "#ef4444";
-  if (score >= 50) return "#f5c542";
-  return "#3ecf8e";
+  if (score >= 70) return "#d64545";
+  if (score >= 50) return "#c9962a";
+  return "#2f9e6b";
 }
 
 function cloneLive(key) {
@@ -194,13 +194,9 @@ function mapMarkup(d, canvasId) {
   const lvl = levelFromScore(d.score);
   const sensorPins = d.sensors
     .map((s) => {
-      const color = s.status === "online" ? "#3ECF8E" : s.status === "warn" ? "#F5C542" : "#EF4444";
-      const ring =
-        s.status === "offline"
-          ? ""
-          : `<circle class="ring" r="10" fill="none" stroke="${color}" stroke-opacity=".5"/>`;
+      const color = s.status === "online" ? "#2F9E6B" : s.status === "warn" ? "#C9962A" : "#D64545";
       return `<g class="pin ${s.status}" transform="translate(${s.x},${s.y})" data-sensor="${s.id}">
-        <circle r="7" fill="#0B1220"/><circle r="4" fill="${color}"/>${ring}
+        <circle r="7" fill="#0D141C"/><circle r="3.5" fill="${color}"/>
       </g>`;
     })
     .join("");
@@ -211,10 +207,10 @@ function mapMarkup(d, canvasId) {
     .map((z, i) => {
       const endX = 180 + i * 70;
       const endY = 220 - i * 12;
-      return `<path d="M${z.x} ${z.y} C${(z.x + endX) / 2} ${z.y + 30} ${(z.x + endX) / 2} ${endY - 20} ${endX} ${endY}" stroke="#7DD3FC" stroke-width="${i ? 2 : 2.5}" stroke-dasharray="6 4" fill="none"/>
+      return `<path d="M${z.x} ${z.y} C${(z.x + endX) / 2} ${z.y + 30} ${(z.x + endX) / 2} ${endY - 20} ${endX} ${endY}" stroke="#5EB0D0" stroke-width="${i ? 2 : 2.5}" stroke-dasharray="5 4" fill="none"/>
         <g transform="translate(${endX},${endY})">
-          <rect x="-10" y="-8" width="20" height="16" rx="3" fill="#0B1220" stroke="#7DD3FC"/>
-          <path d="M-6 2 V-2 H6 V2" stroke="#7DD3FC" stroke-width="1.5" fill="none"/>
+          <rect x="-10" y="-8" width="20" height="16" rx="2" fill="#0D141C" stroke="#5EB0D0"/>
+          <path d="M-6 2 V-2 H6 V2" stroke="#5EB0D0" stroke-width="1.5" fill="none"/>
         </g>`;
     })
     .join("");
@@ -244,13 +240,13 @@ function mapMarkup(d, canvasId) {
           <stop offset="0%" stop-color="#243B4A"/><stop offset="100%" stop-color="#142230"/>
         </linearGradient>
         <radialGradient id="riskRed-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".72"/><stop offset="100%" stop-color="#FF4D4D" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#D64545" stop-opacity=".55"/><stop offset="100%" stop-color="#D64545" stop-opacity="0"/>
         </radialGradient>
         <radialGradient id="riskAmber-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#F5C542" stop-opacity=".58"/><stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#C9962A" stop-opacity=".45"/><stop offset="100%" stop-color="#C9962A" stop-opacity="0"/>
         </radialGradient>
         <radialGradient id="riskGreen-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#3ECF8E" stop-opacity=".48"/><stop offset="100%" stop-color="#3ECF8E" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#2F9E6B" stop-opacity=".35"/><stop offset="100%" stop-color="#2F9E6B" stop-opacity="0"/>
         </radialGradient>
         <pattern id="grid-${canvasId}" width="24" height="24" patternUnits="userSpaceOnUse">
           <path d="M24 0H0V24" fill="none" stroke="rgba(120,160,200,.08)" stroke-width="1"/>
@@ -264,8 +260,8 @@ function mapMarkup(d, canvasId) {
       <g class="zones layer-risk">${riskEllipses}</g>
       <g class="routes layer-routes" opacity="0">${routePaths}</g>
       <g class="sensors layer-sensors">${sensorPins}</g>
-      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.08em">ASSAM · NORTHEAST INDIA</text>
-      <text x="20" y="52" fill="#E8EEF7" font-size="14" font-family="Sora, sans-serif" font-weight="600">${d.name}</text>
+      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.06em">ASSAM · NORTHEAST INDIA</text>
+      <text x="20" y="52" fill="#E6EBF2" font-size="14" font-family="Barlow, IBM Plex Sans, sans-serif" font-weight="700">${d.name}</text>
     </svg>
     <div class="map-legend">
       <span><i class="dot red"></i>High</span>
@@ -344,10 +340,10 @@ function renderTrend() {
 
   $("#trendMeta").textContent =
     d.score >= 70
-      ? `Risk climbed to ${d.score} after prolonged monsoon rainfall.`
+      ? `District risk index at ${d.score} after sustained monsoon rainfall.`
       : d.score >= 50
-        ? `Watch band sustained by soil saturation at ${d.soil}%.`
-        : `Trend remains within the stable operating band (score ${d.score}).`;
+        ? `Watch band held by soil saturation at ${Math.round(d.soil)}%.`
+        : `Risk index stable at ${d.score} within operating limits.`;
 }
 
 function renderHome() {
@@ -357,55 +353,45 @@ function renderHome() {
 
   const alertTitle =
     lvl.cls === "high"
-      ? `HIGH RISK ALERT — ${d.name}`
+      ? `HIGH RISK ALERT · ${d.name}`
       : lvl.cls === "watch"
-        ? `WATCH ADVISORY — ${d.name}`
-        : `STABLE — ${d.name}`;
+        ? `WATCH ADVISORY · ${d.name}`
+        : `STABLE · ${d.name}`;
   const alertCopy =
     lvl.cls === "high"
-      ? `AI forecasts slope failure within hours. Evacuate ${top.id}.`
+      ? `Model indicates rising slope failure probability. Evacuate ${top.title}.`
       : lvl.cls === "watch"
-        ? `Saturated soils elevating risk. Restrict hill traffic near ${top.id}.`
-        : `No critical slope movement. Continue routine sensor checks.`;
+        ? `Soil saturation is elevating cut-slope risk near ${top.title}. Restrict hill traffic.`
+        : `No critical slope movement recorded. Continue routine sensor checks.`;
 
   $("#alertTitle").textContent = alertTitle;
   $("#alertCopy").textContent = alertCopy;
 
   const alert = $("#alertStrip");
   const cta = $("#viewAlert");
+  alert.classList.remove("level-watch", "level-safe");
   if (lvl.cls === "safe") {
-    alert.style.background = "linear-gradient(105deg, rgba(62,207,142,0.18), rgba(62,207,142,0.06))";
-    alert.style.borderColor = "rgba(62,207,142,0.35)";
-    $(".alert-icon").style.background = "#3ecf8e";
-    cta.style.background = "#2f9f86";
+    alert.classList.add("level-safe");
     cta.textContent = "View";
-    $("#alertCopy").style.color = "#b7e8cf";
   } else if (lvl.cls === "watch") {
-    alert.style.background = "linear-gradient(105deg, rgba(245,197,66,0.2), rgba(245,197,66,0.06))";
-    alert.style.borderColor = "rgba(245,197,66,0.4)";
-    $(".alert-icon").style.background = "#f5c542";
-    cta.style.background = "#c9971f";
+    alert.classList.add("level-watch");
     cta.textContent = "Review";
-    $("#alertCopy").style.color = "#f0d48a";
   } else {
-    alert.style.background = "";
-    alert.style.borderColor = "";
-    $(".alert-icon").style.background = "";
-    cta.style.background = "";
     cta.textContent = "Act";
-    $("#alertCopy").style.color = "";
   }
 
   $("#scoreValue").textContent = Math.round(d.score);
   $("#scoreRing").style.setProperty("--p", d.score);
-  $("#scoreRing").style.background = `radial-gradient(closest-side, var(--surface) 74%, transparent 75% 100%), conic-gradient(${riskColor(d.score)} calc(${d.score} * 1%), rgba(255,255,255,0.08) 0)`;
+  $("#scoreRing").style.background = `radial-gradient(closest-side, var(--surface) 74%, transparent 75% 100%), conic-gradient(${riskColor(d.score)} calc(${d.score} * 1%), #2a3340 0)`;
   $("#riskLevel").textContent = lvl.level;
   $("#riskLevel").className = `level ${lvl.cls}`;
   $("#riskMeta").textContent = `Confidence ${d.confidence}% · ${formatUpdated(state.updatedAt)}`;
 
   $("#aiHeadline").textContent = d.aiHeadline;
   $("#aiMeta").textContent = d.aiMeta;
-  $("#aiBarFill").style.width = `${d.score}%`;
+  const aiFill = $("#aiBarFill");
+  aiFill.style.width = `${d.score}%`;
+  aiFill.className = lvl.cls === "high" ? "" : lvl.cls;
 
   $("#rainValue").textContent = Math.round(d.rain);
   $("#rainChart").innerHTML = d.rainSeries
@@ -471,7 +457,7 @@ function renderSensors() {
     .map((s) => {
       const detail =
         s.status === "offline"
-          ? "Offline · no packet"
+          ? "Offline · last packet lost"
           : `${s.status === "warn" ? "Degraded" : "Online"} · ${s.value}${s.unit}`;
       return `<div class="sensor ${s.status}" data-sensor="${s.id}">
         <div class="sensor-top"><span>${s.id}</span><i></i></div>
@@ -498,7 +484,7 @@ function renderSensors() {
 
   $("#telemetryList").innerHTML = d.sensors
     .map((s) => {
-      const reading = s.status === "offline" ? "—" : `${s.value}${s.unit}`;
+      const reading = s.status === "offline" ? "No signal" : `${s.value}${s.unit}`;
       return `<li>
         <span class="z-dot ${s.status === "online" ? "green" : s.status === "warn" ? "amber" : "red"}"></span>
         <div><strong>${s.id} · ${s.name}</strong><p>${formatUpdated(state.updatedAt)}</p></div>
@@ -511,7 +497,7 @@ function renderSensors() {
     el.addEventListener("click", () => {
       $$("#sensorGrid .sensor").forEach((s) => s.classList.remove("selected"));
       el.classList.add("selected");
-      toast(`Selected sensor ${el.dataset.sensor}`);
+      toast(`Sensor ${el.dataset.sensor} selected`);
     });
   });
 }
@@ -540,7 +526,7 @@ function renderRelief() {
     .join("");
 
   $$("#shelterList button").forEach((btn) => {
-    btn.addEventListener("click", () => toast(`Routing response teams to ${btn.dataset.shelter}.`));
+    btn.addEventListener("click", () => toast(`Directions opened for ${btn.dataset.shelter}`));
   });
 
   $("#broadcastLog").innerHTML = state.broadcastLog.length
@@ -548,14 +534,14 @@ function renderRelief() {
         .slice(0, 6)
         .map((e) => `<li>${e.time} · ${e.message}</li>`)
         .join("")
-    : `<li>No broadcasts sent in this session.</li>`;
+    : `<li>No broadcasts issued this session.</li>`;
 
   const siren = $("#sirenBtn");
   siren.classList.toggle("active-siren", state.sirenOn);
   siren.querySelector("span").textContent = state.sirenOn ? "Siren Active" : "Activate Siren";
   $("#controlNote").textContent = state.sirenOn
-    ? `Broadcasting audible warning across ${d.name}`
-    : "Authorized for ASDMA & district controllers";
+    ? `Sirens sounding in ${d.name}. Controllers remain logged.`
+    : "Authorized for ASDMA and district controllers only";
 }
 
 function buildNotifications() {
@@ -676,26 +662,26 @@ function tickLive() {
   const d = state.live;
   if (!d) return;
 
-  d.rain = Math.max(0, d.rain + (Math.random() * 1.4 - 0.5));
-  d.soil = Math.min(100, Math.max(0, d.soil + (Math.random() * 1.2 - 0.5)));
-  d.score = Math.min(99, Math.max(5, d.score + (Math.random() * 1.6 - 0.7)));
+  d.rain = Math.max(0, +(d.rain + (Math.random() * 0.6 - 0.2)).toFixed(1));
+  d.soil = Math.min(100, Math.max(0, +(d.soil + (Math.random() * 0.5 - 0.2)).toFixed(1)));
+  d.score = Math.min(99, Math.max(5, +(d.score + (Math.random() * 0.7 - 0.3)).toFixed(1)));
   d.rainSeries = d.rainSeries.map((v, i) => (i === d.rainSeries.length - 1 ? Math.round(d.rain) : v));
   d.sensors = d.sensors.map((s) => {
     if (s.status === "offline" || s.value == null) return s;
-    const delta = (Math.random() - 0.45) * (s.unit === "°" ? 0.08 : s.unit === "%" ? 0.6 : 0.5);
+    const delta = (Math.random() - 0.48) * (s.unit === "°" ? 0.04 : s.unit === "%" ? 0.3 : 0.25);
     return { ...s, value: Math.round((s.value + delta) * 10) / 10 };
   });
 
   const lvl = levelFromScore(d.score);
   if (lvl.cls === "high") {
-    d.aiHeadline = "Slope instability rising";
-    d.aiMeta = "Failure window: 4–12 hours";
+    d.aiHeadline = `Slope instability rising on ${d.zones[0].title.split(" ").slice(1).join(" ") || d.name}`;
+    d.aiMeta = "Estimated failure window: 4 to 12 hours";
   } else if (lvl.cls === "watch") {
-    d.aiHeadline = "Moisture-driven risk elevated";
-    d.aiMeta = `Escalate if rainfall exceeds ${d.rainThreshold} mm`;
+    d.aiHeadline = "Soil saturation elevating cut-slope risk";
+    d.aiMeta = `Escalate if 24h rainfall exceeds ${d.rainThreshold} mm`;
   } else {
-    d.aiHeadline = "Conditions within safe band";
-    d.aiMeta = "Next model refresh in 15 min";
+    d.aiHeadline = "No critical displacement detected";
+    d.aiMeta = "Next model cycle in 15 minutes";
   }
 
   state.updatedAt = Date.now();
@@ -722,7 +708,7 @@ function setupEvents() {
         detail.innerHTML = `<h3>${top.title}</h3>
           <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Layer view: <strong>${state.layer}</strong>.</p>`;
       }
-      toast(`${state.layer[0].toUpperCase()}${state.layer.slice(1)} layer active`);
+      toast(`${state.layer[0].toUpperCase()}${state.layer.slice(1)} layer shown`);
     });
   });
 
@@ -740,7 +726,7 @@ function setupEvents() {
     state.layer = "risk";
     syncLayerChips();
     applyLayer($("#mapCanvasFull"), "risk");
-    toast("Opening highest-risk zone on map.");
+    toast("Opened district hazard map");
   });
 
   $("#notifBtn").addEventListener("click", () => {
@@ -753,7 +739,7 @@ function setupEvents() {
   $("#markReadBtn").addEventListener("click", () => {
     state.notifications.forEach((n) => (n.unread = false));
     renderNotifications();
-    toast("All alerts marked as read.");
+    toast("Alerts marked as read");
   });
 
   document.addEventListener("click", (e) => {
@@ -768,20 +754,20 @@ function setupEvents() {
   $("#sirenBtn").addEventListener("click", async () => {
     if (state.sirenOn) {
       state.sirenOn = false;
-      logBroadcast(`Sirens deactivated in ${state.live.name}`);
-      toast("Sirens deactivated.");
+      logBroadcast(`Sirens stopped in ${state.live.name}`);
+      toast("Sirens stopped");
       renderRelief();
       return;
     }
     const ok = await confirmAction({
       title: "Activate community sirens?",
-      body: `This will sound audible warnings across ${state.live.name} for landslide risk. Controllers will be logged.`,
+      body: `This sounds audible warnings across ${state.live.name}. The action is logged for ASDMA controllers.`,
       confirmLabel: "Activate Siren",
     });
     if (!ok) return;
     state.sirenOn = true;
     logBroadcast(`Sirens activated in ${state.live.name}`);
-    toast("Community sirens activated.");
+    toast("Sirens activated");
     renderRelief();
   });
 
@@ -789,12 +775,12 @@ function setupEvents() {
     const recipients = 1200 + Math.round(Math.random() * 800);
     const ok = await confirmAction({
       title: "Send SMS alert?",
-      body: `Push landslide advisory SMS to approximately ${recipients.toLocaleString("en-IN")} registered residents and response teams in ${state.live.name}.`,
+      body: `Send landslide advisory SMS to about ${recipients.toLocaleString("en-IN")} registered residents and response teams in ${state.live.name}.`,
       confirmLabel: "Send SMS",
     });
     if (!ok) return;
     logBroadcast(`SMS advisory queued · ${recipients.toLocaleString("en-IN")} recipients`);
-    toast("SMS alert queued to residents & response teams.");
+    toast("SMS alert queued");
   });
 
   window.addEventListener("hashchange", () => {
@@ -810,7 +796,7 @@ function init() {
   renderAll();
   const initial = location.hash.replace("#", "");
   navigate(["home", "map", "sensors", "relief"].includes(initial) ? initial : "home");
-  setInterval(tickLive, 5000);
+  setInterval(tickLive, 7000);
   setInterval(() => {
     if (state.view === "home") $("#riskMeta").textContent = `Confidence ${state.live.confidence}% · ${formatUpdated(state.updatedAt)}`;
   }, 1000);
