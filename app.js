@@ -191,7 +191,7 @@ function toast(message) {
 
 function mapMarkup(d, canvasId) {
   const topZone = [...d.zones].sort((a, b) => b.score - a.score)[0];
-  const lvl = levelFromScore(d.score);
+  const zoneLvl = levelFromScore(topZone.score);
   const sensorPins = d.sensors
     .map((s) => {
       const color = s.status === "online" ? "#2F9E6B" : s.status === "warn" ? "#C9962A" : "#D64545";
@@ -268,9 +268,9 @@ function mapMarkup(d, canvasId) {
       <span><i class="dot amber"></i>Watch</span>
       <span><i class="dot green"></i>Stable</span>
     </div>
-    <div class="map-float risk-pill ${lvl.cls === "high" ? "" : lvl.cls}">
+    <div class="map-float risk-pill ${zoneLvl.cls === "high" ? "" : zoneLvl.cls}">
       <span class="label">Zone ${topZone.id}</span>
-      <strong>${lvl.pill}</strong>
+      <strong>${zoneLvl.pill}</strong>
     </div>`;
 }
 
@@ -435,7 +435,7 @@ function renderHome() {
   $$("#zoneList li").forEach((li) => {
     li.addEventListener("click", () => {
       navigate("map");
-      toast(`Focused ${li.dataset.zone} on district map.`);
+      toast(`Map focused on ${li.dataset.zone}`);
     });
   });
 
