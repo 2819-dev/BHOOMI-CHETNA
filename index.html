@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -26,7 +27,7 @@
           </div>
           <div class="brand-text">
             <h1>BHOOMI CHETNA</h1>
-            <p class="live-line"><span class="status-dot"></span> Simulated feed · ASDMA</p>
+            <p class="live-line"><span class="status-dot"></span> Connecting · ASDMA</p>
           </div>
         </div>
         <div class="topbar-end">
@@ -38,7 +39,7 @@
         </div>
       </div>
       <div class="topbar-tools">
-        <span class="data-chip" title="Values are simulated client-side data, not a live ASDMA production feed">Simulated</span>
+        <span class="data-chip" title="Rainfall and soil moisture from Open-Meteo. Geotech nodes await ASDMA link.">…</span>
         <label class="district-select">
           <span class="sr-only">District Focus</span>
           <div class="select-shell">
@@ -76,7 +77,7 @@
         <div class="home-layout">
           <section class="map-panel" aria-label="Live geo-hazard map">
             <div class="map-chrome">
-              <span class="map-title">Schematic Geo-Hazard Map</span>
+              <span class="map-title">District Hazard Map</span>
               <div class="map-toggles" id="mapTogglesHome">
                 <button class="chip active" type="button" data-layer="risk">Risk</button>
                 <button class="chip" type="button" data-layer="sensors">Sensors</button>
@@ -96,7 +97,7 @@
                 </div>
                 <div class="score-copy">
                   <p class="level high" id="riskLevel">HIGH RISK</p>
-                  <p class="meta" id="riskMeta">Confidence 91% · Simulated reading</p>
+                  <p class="meta" id="riskMeta">Open-Meteo · loading</p>
                   <div class="score-track" aria-hidden="true"><span id="scoreFill" style="width:78%"></span></div>
                 </div>
               </div>
@@ -153,7 +154,7 @@
                 </svg>
                 <div class="trend-labels" id="trendLabels"></div>
               </div>
-              <p class="meta" id="trendMeta">Historical series from simulated dataset.</p>
+              <p class="meta" id="trendMeta">Risk index from live rainfall and soil moisture.</p>
             </article>
           </div>
         </div>
@@ -163,7 +164,7 @@
       <section class="view" id="view-map" data-view="map" aria-label="Full map" hidden>
         <div class="map-panel map-panel-full">
           <div class="map-chrome">
-            <span class="map-title">District Schematic Map</span>
+            <span class="map-title">District Map</span>
             <div class="map-toggles" id="mapTogglesFull">
               <button class="chip active" type="button" data-layer="risk">Risk</button>
               <button class="chip" type="button" data-layer="sensors">Sensors</button>
@@ -179,8 +180,8 @@
       <section class="view" id="view-sensors" data-view="sensors" aria-label="Sensor network" hidden>
         <div class="card">
           <div class="card-head">
-            <p class="card-label">IoT Sensor Network</p>
-            <span class="live-tag"><span class="status-dot"></span> Simulated telemetry</span>
+            <p class="card-label">Sensor Network</p>
+            <span class="live-tag"><span class="status-dot"></span> Live weather · geotech pending</span>
           </div>
           <div class="sensor-summary" id="sensorSummary"></div>
           <div class="sensor-grid sensor-grid-lg" id="sensorGrid"></div>
@@ -250,7 +251,7 @@
             <p class="card-label">Controller Accounts</p>
             <span class="count-pill soft">Owner only</span>
           </div>
-          <p class="meta">Create ID + PIN accounts for controllers. Share PINs out of band. No public demo credentials.</p>
+          <p class="meta">Create ID + PIN accounts for controllers. Share PINs out of band.</p>
           <form class="officer-form" id="createAccountForm">
             <label>Controller ID
               <input type="text" id="newCtrlId" required maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" autocomplete="off" />
@@ -358,7 +359,7 @@
   <div class="modal" id="authModal" hidden>
     <div class="modal-card auth-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
       <h2 id="authTitle">Secure sign-in</h2>
-      <p class="meta">Admin and broadcast controls require authenticated access. There are no public demo credentials.</p>
+      <p class="meta">Admin and broadcast controls require authenticated access.</p>
       <div class="auth-tabs" role="tablist">
         <button type="button" class="auth-tab active" data-auth-mode="controller" id="tabController">Controller</button>
         <button type="button" class="auth-tab" data-auth-mode="owner" id="tabOwner">Owner</button>
@@ -404,6 +405,7 @@
   </div>
 
   <div class="toast" id="toast" hidden></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>

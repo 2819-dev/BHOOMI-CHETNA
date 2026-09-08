@@ -2,31 +2,24 @@
 
 Landslide early warning console for Assam State Disaster Management Authority (ASDMA).
 
-Sensor readings, risk scores, and maps in this build use **simulated client-side data**. Siren and SMS actions log locally and are not connected to field hardware or carriers.
+## Live data
+
+- **Maps** — real OpenStreetMap tiles (Leaflet) for Guwahati Hills, Dima Hasao, Cachar, and Karbi Anglong
+- **Rainfall & soil moisture** — live Open-Meteo for each district; risk score is computed from those readings against admin thresholds
+- **Geotech sensors** (incline, pore pressure, etc.) — marked awaiting ASDMA field feed until you connect your sensor API
+- **Siren / SMS** — commands are queued in-app; wire ASDMA carrier / siren endpoints for field actuation
 
 ## Access
 
-There are **no public demo credentials**.
-
-- **Owner** — paste the private master PIN (long, copy-paste only). Verified by SHA-256 hash in the app; plaintext is never shipped.
-- **Controllers** — sign in with an ID and PIN created by the owner in Admin → Controller Accounts.
-
-Public views (Home, Map, Sensors, Relief) stay open; Admin and broadcast controls stay locked until sign-in.
-
-## Focus districts
-
-Guwahati Hills · Dima Hasao · Cachar · Karbi Anglong
+- **Owner** — private master PIN (hash-verified; plaintext never shipped)
+- **Controllers** — ID + PIN accounts created by the owner in Admin
 
 ## Includes
 
-- Schematic geo-hazard mapping with risk, sensor, and route layers
-- Landslide risk scoring and model prediction
-- Simulated IoT sensor telemetry
-- Rainfall and soil moisture monitoring
-- High-risk zone identification and emergency alerts
-- Evacuation routes and nearby relief shelters
-- Authenticated siren and SMS controls (local log only)
-- Historical risk trends
-- Administrator panel for thresholds, sensor maintenance, duty roster, controller accounts, and broadcast archive
+- Live district hazard map with risk, sensor, and route layers
+- Threshold-based landslide risk scoring from live weather
+- Sensor panel (live weather nodes + pending geotech)
+- Evacuation routes and shelters with OSM directions
+- Authenticated admin for thresholds, roster, accounts, and broadcast archive
 
 Netlify publishes the repository root.
