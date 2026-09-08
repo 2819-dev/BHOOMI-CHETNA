@@ -1,18 +1,17 @@
 # BHOOMI CHETNA
 
-Landslide early warning demonstration for Assam State Disaster Management Authority (ASDMA).
+Landslide early warning console for Assam State Disaster Management Authority (ASDMA).
 
-Sensor readings, risk scores, maps, sirens, and SMS actions in this build are **demo / simulated data**. They are not connected to live ASDMA production feeds or field hardware.
+Sensor readings, risk scores, and maps in this build use **simulated client-side data**. Siren and SMS actions log locally and are not connected to field hardware or carriers.
 
 ## Access
 
-- Public: Home, Map, Sensors, Relief (broadcast controls locked)
-- Controllers: sign in to unlock Admin and siren/SMS controls
+There are **no public demo credentials**.
 
-Demo controller credentials (placeholder for live ASDMA SSO):
+- **Owner** — paste the private master PIN (long, copy-paste only). Verified by SHA-256 hash in the app; plaintext is never shipped.
+- **Controllers** — sign in with an ID and PIN created by the owner in Admin → Controller Accounts.
 
-- ID: `controller`
-- PIN: `ASDMA26`
+Public views (Home, Map, Sensors, Relief) stay open; Admin and broadcast controls stay locked until sign-in.
 
 ## Focus districts
 
@@ -26,8 +25,8 @@ Guwahati Hills · Dima Hasao · Cachar · Karbi Anglong
 - Rainfall and soil moisture monitoring
 - High-risk zone identification and emergency alerts
 - Evacuation routes and nearby relief shelters
-- Controller-gated demonstration siren and SMS controls
+- Authenticated siren and SMS controls (local log only)
 - Historical risk trends
-- Administrator panel for thresholds, sensor maintenance, sample duty roster, and broadcast archive
+- Administrator panel for thresholds, sensor maintenance, duty roster, controller accounts, and broadcast archive
 
 Netlify publishes the repository root.

@@ -3,3 +3,7 @@ package-lock.json
 package.json
 .DS_Store
 *.log
+
+# Owner secrets — never commit plaintext master PIN
+OWNER_MASTER_PIN.txt
+secrets/

@@ -140,13 +140,12 @@ const DISTRICT_DATA = {
 };
 
 const ADMIN_KEY = "bhoomi-chetna-admin-v1";
-const AUTH_KEY = "bhoomi-chetna-auth-v1";
+const AUTH_SESSION_KEY = "bhoomi-chetna-session-v1";
+const AUTH_ACCOUNTS_KEY = "bhoomi-chetna-accounts-v1";
 
-/** Demo-only credentials. Replace with ASDMA SSO / IAM in production. */
-const DEMO_AUTH = {
-  id: "controller",
-  pin: "ASDMA26",
-};
+/** SHA-256 of the owner master PIN. Plaintext PIN is never shipped in the app. */
+const OWNER_PIN_HASH =
+  "540e3100b7ac7ff7b27c34571e46a11062844cc4e575ec6069ca24caa682e038";
 
 const DEFAULT_ADMIN = {
   highScore: 70,
@@ -157,9 +156,9 @@ const DEFAULT_ADMIN = {
   sirenArmed: true,
   operatorId: "op-1",
   officers: [
-    { id: "op-1", name: "ASDMA Controller", role: "Demo controller account" },
-    { id: "op-2", name: "District Officer", role: "Demo · Kamrup Metro" },
-    { id: "op-3", name: "Field Lead", role: "Demo · Karbi Anglong" },
+    { id: "op-1", name: "ASDMA Controller", role: "Duty desk" },
+    { id: "op-2", name: "District Officer", role: "Kamrup Metro" },
+    { id: "op-3", name: "Field Lead", role: "Karbi Anglong" },
   ],
   maintenance: {},
   archive: [],
@@ -191,7 +190,10 @@ const state = {
   live: null,
   admin: loadAdmin(),
   lastRiskClass: null,
-  authed: sessionStorage.getItem(AUTH_KEY) === "1",
+  session: loadSession(),
+  get authed() {
+    return Boolean(this.session);
+  },
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -596,16 +598,16 @@ function renderRelief() {
   $("#sirenBtn").disabled = locked;
   $("#smsBtn").disabled = locked;
   $("#broadcastLockNote").hidden = !locked;
-  $("#broadcastLockNote").textContent = "Controller sign-in required to operate sirens or SMS.";
+  $("#broadcastLockNote").textContent = "Sign in required to operate sirens or SMS.";
 
   const siren = $("#sirenBtn");
   siren.classList.toggle("active-siren", state.sirenOn);
-  siren.querySelector("span").textContent = state.sirenOn ? "Siren Active (demo)" : "Activate Siren (demo)";
+  siren.querySelector("span").textContent = state.sirenOn ? "Siren Active" : "Activate Siren";
   $("#controlNote").textContent = !state.authed
-    ? "Sign in as a controller to unlock demonstration broadcast controls."
+    ? "Sign in with a controller ID/PIN or the owner master PIN to unlock broadcast controls."
     : state.sirenOn
-      ? `Demo siren active for ${d.name}. Not linked to field hardware.`
-      : "Demonstration controls · not linked to field hardware or SMS carriers";
+      ? `Siren log active for ${d.name}. Not linked to field hardware.`
+      : "Controls log locally · not linked to field hardware or SMS carriers";
 }
 
 function buildNotifications() {
@@ -743,61 +745,233 @@ function renderAdmin() {
     : `<li>No broadcast records yet.</li>`;
 }
 
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(AUTH_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.role && parsed?.id) return { role: parsed.role, id: String(parsed.id) };
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function persistSession() {
+  if (!state.session) {
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
+    return;
+  }
+  sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(state.session));
+}
+
+function loadAccounts() {
+  try {
+    const raw = localStorage.getItem(AUTH_ACCOUNTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAccounts(list) {
+  localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(list));
+}
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(String(text));
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 function syncAuthUI() {
   const btn = $("#authBtn");
   const adminTab = $("#adminTab");
   const tabbar = $(".tabbar");
+  const accountsCard = $("#accountsCard");
   if (state.authed) {
-    const op = currentOperator();
-    btn.textContent = `Sign out · ${op.name}`;
+    const label =
+      state.session.role === "owner"
+        ? "Owner"
+        : `Controller · ${state.session.id}`;
+    btn.textContent = `Sign out · ${label}`;
     btn.classList.add("signed-in");
-    btn.title = `Signed in as ${op.name}`;
+    btn.title = `Signed in as ${label}`;
     adminTab.hidden = false;
     tabbar.classList.add("authed");
   } else {
-    btn.textContent = "Controller sign-in";
+    btn.textContent = "Sign in";
     btn.classList.remove("signed-in");
     btn.title = "Sign in to access Admin and broadcast controls";
     adminTab.hidden = true;
     tabbar.classList.remove("authed");
   }
+  if (accountsCard) {
+    accountsCard.hidden = !(state.session && state.session.role === "owner");
+  }
+  if (state.session?.role === "owner") renderAccountList();
+}
+
+function setAuthMode(mode) {
+  const isOwner = mode === "owner";
+  $("#tabController").classList.toggle("active", !isOwner);
+  $("#tabOwner").classList.toggle("active", isOwner);
+  $("#controllerForm").hidden = isOwner;
+  $("#ownerForm").hidden = !isOwner;
+  $("#authError").hidden = true;
+  $("#ownerError").hidden = true;
 }
 
 function openAuthModal() {
   $("#authError").hidden = true;
+  $("#ownerError").hidden = true;
   $("#authId").value = "";
   $("#authPin").value = "";
+  $("#ownerPin").value = "";
+  setAuthMode("controller");
   $("#authModal").hidden = false;
   setTimeout(() => $("#authId").focus(), 50);
 }
 
 function closeAuthModal() {
   $("#authModal").hidden = true;
+  $("#ownerPin").value = "";
+  $("#authPin").value = "";
 }
 
-function signIn(id, pin) {
-  if (id.trim() === DEMO_AUTH.id && pin === DEMO_AUTH.pin) {
-    state.authed = true;
-    sessionStorage.setItem(AUTH_KEY, "1");
-    closeAuthModal();
-    syncAuthUI();
-    renderRelief();
-    toast("Controller signed in");
-    return true;
+function renderAccountList() {
+  const list = $("#accountList");
+  const empty = $("#accountEmpty");
+  if (!list) return;
+  const accounts = loadAccounts();
+  list.innerHTML = "";
+  if (!accounts.length) {
+    if (empty) empty.hidden = false;
+    return;
   }
-  $("#authError").hidden = false;
-  return false;
+  if (empty) empty.hidden = true;
+  accounts.forEach((account) => {
+    const row = document.createElement("div");
+    row.className = "account-row";
+    const meta = document.createElement("div");
+    const strong = document.createElement("strong");
+    strong.textContent = account.id;
+    const span = document.createElement("span");
+    span.className = "meta";
+    span.textContent = ` · created ${new Date(account.createdAt).toLocaleString()}`;
+    meta.append(strong, span);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn ghost compact";
+    btn.dataset.revoke = account.id;
+    btn.textContent = "Revoke";
+    row.append(meta, btn);
+    list.appendChild(row);
+  });
+}
+
+async function signInController(id, pin) {
+  const controllerId = String(id || "").trim();
+  const pinValue = String(pin || "");
+  if (!controllerId || !pinValue) {
+    $("#authError").textContent = "Enter controller ID and PIN.";
+    $("#authError").hidden = false;
+    return false;
+  }
+  const accounts = loadAccounts();
+  const account = accounts.find((a) => a.id.toLowerCase() === controllerId.toLowerCase());
+  if (!account) {
+    $("#authError").textContent = "Unknown controller ID. Ask the owner to create an account.";
+    $("#authError").hidden = false;
+    return false;
+  }
+  const hash = await sha256Hex(pinValue);
+  if (hash !== account.pinHash) {
+    $("#authError").textContent = "Invalid controller PIN.";
+    $("#authError").hidden = false;
+    return false;
+  }
+  state.session = { role: "controller", id: account.id };
+  persistSession();
+  closeAuthModal();
+  syncAuthUI();
+  renderRelief();
+  toast(`Signed in as ${account.id}`);
+  return true;
+}
+
+async function signInOwner(pin) {
+  const pinValue = String(pin || "").trim();
+  if (!pinValue) {
+    $("#ownerError").textContent = "Paste the owner master PIN.";
+    $("#ownerError").hidden = false;
+    return false;
+  }
+  const hash = await sha256Hex(pinValue);
+  if (hash !== OWNER_PIN_HASH) {
+    $("#ownerError").textContent = "Invalid owner master PIN.";
+    $("#ownerError").hidden = false;
+    return false;
+  }
+  state.session = { role: "owner", id: "OWNER" };
+  persistSession();
+  closeAuthModal();
+  syncAuthUI();
+  renderRelief();
+  if (state.view === "admin") renderAdmin();
+  toast("Owner signed in");
+  return true;
 }
 
 function signOut() {
   const wasAdmin = state.view === "admin";
-  state.authed = false;
+  state.session = null;
   state.sirenOn = false;
-  sessionStorage.removeItem(AUTH_KEY);
+  persistSession();
   syncAuthUI();
   renderRelief();
   if (wasAdmin) navigate("home");
-  toast("Controller signed out");
+  toast("Signed out");
+}
+
+async function createControllerAccount(id, pin) {
+  if (state.session?.role !== "owner") {
+    toast("Only the owner can create controller accounts");
+    return false;
+  }
+  const controllerId = String(id || "").trim();
+  const pinValue = String(pin || "");
+  if (!/^[A-Za-z0-9._-]{3,32}$/.test(controllerId)) {
+    toast("ID must be 3–32 chars (letters, numbers, . _ -)");
+    return false;
+  }
+  if (pinValue.length < 8) {
+    toast("Controller PIN must be at least 8 characters");
+    return false;
+  }
+  const accounts = loadAccounts();
+  if (accounts.some((a) => a.id.toLowerCase() === controllerId.toLowerCase())) {
+    toast("That controller ID already exists");
+    return false;
+  }
+  const pinHash = await sha256Hex(pinValue);
+  accounts.push({ id: controllerId, pinHash, createdAt: Date.now() });
+  saveAccounts(accounts);
+  renderAccountList();
+  toast(`Controller ${controllerId} created`);
+  return true;
+}
+
+function revokeControllerAccount(id) {
+  if (state.session?.role !== "owner") {
+    toast("Only the owner can revoke accounts");
+    return;
+  }
+  saveAccounts(loadAccounts().filter((a) => a.id !== id));
+  renderAccountList();
+  toast(`Revoked ${id}`);
 }
 
 function renderAll() {
@@ -822,7 +996,7 @@ function setDistrict(key) {
 function navigate(view) {
   if (view === "admin" && !state.authed) {
     openAuthModal();
-    toast("Controller sign-in required for Admin");
+    toast("Sign-in required for Admin");
     return;
   }
   state.view = view;
@@ -866,6 +1040,12 @@ function confirmAction({ title, body, confirmLabel = "Confirm" }) {
 }
 
 function currentOperator() {
+  if (state.session?.role === "owner") {
+    return { id: "OWNER", name: "Owner", role: "System owner" };
+  }
+  if (state.session?.role === "controller") {
+    return { id: state.session.id, name: state.session.id, role: "Controller" };
+  }
   return state.admin.officers.find((o) => o.id === state.admin.operatorId) || state.admin.officers[0];
 }
 
@@ -910,8 +1090,8 @@ function tickLive() {
   }
 
   if (state.lastRiskClass !== "high" && lvl.cls === "high" && state.admin.autoSms) {
-    logBroadcast(`Demo auto SMS queued for ${d.name} high-risk crossing`);
-    toast(`Demo auto SMS queued for ${d.name}`);
+    logBroadcast(`Auto SMS queued for ${d.name} high-risk crossing`);
+    toast(`Auto SMS queued for ${d.name}`);
   }
   state.lastRiskClass = lvl.cls;
 
@@ -983,7 +1163,7 @@ function setupEvents() {
   $("#sirenBtn").addEventListener("click", async () => {
     if (!state.authed) {
       openAuthModal();
-      toast("Controller sign-in required");
+      toast("Sign-in required");
       return;
     }
     if (!state.admin.sirenArmed && !state.sirenOn) {
@@ -998,32 +1178,32 @@ function setupEvents() {
       return;
     }
     const ok = await confirmAction({
-      title: "Activate demo community sirens?",
-      body: `This only logs a demonstration siren event for ${state.live.name}. It does not trigger field hardware.`,
-      confirmLabel: "Activate Demo Siren",
+      title: "Activate community sirens?",
+      body: `This logs a siren event for ${state.live.name}. It does not trigger field hardware.`,
+      confirmLabel: "Activate Siren",
     });
     if (!ok) return;
     state.sirenOn = true;
-    logBroadcast(`Demo sirens activated in ${state.live.name}`);
-    toast("Demo sirens activated");
+    logBroadcast(`Sirens activated in ${state.live.name}`);
+    toast("Sirens activated (log only)");
     renderRelief();
   });
 
   $("#smsBtn").addEventListener("click", async () => {
     if (!state.authed) {
       openAuthModal();
-      toast("Controller sign-in required");
+      toast("Sign-in required");
       return;
     }
     const recipients = state.live.shelters.reduce((sum, s) => sum + s.capacity, 0);
     const ok = await confirmAction({
-      title: "Queue demonstration SMS?",
+      title: "Queue SMS advisory?",
       body: `This logs an SMS advisory for about ${recipients.toLocaleString("en-IN")} shelter-capacity contacts in ${state.live.name}. No message is sent to carriers.`,
-      confirmLabel: "Queue Demo SMS",
+      confirmLabel: "Queue SMS",
     });
     if (!ok) return;
-    logBroadcast(`Demo SMS queued · ${recipients.toLocaleString("en-IN")} capacity contacts`);
-    toast("Demo SMS queued (not sent)");
+    logBroadcast(`SMS queued · ${recipients.toLocaleString("en-IN")} capacity contacts`);
+    toast("SMS queued (not sent)");
   });
 
   $("#authBtn").addEventListener("click", () => {
@@ -1032,15 +1212,43 @@ function setupEvents() {
   });
 
   $("#authCancel").addEventListener("click", closeAuthModal);
+  $("#ownerCancel").addEventListener("click", closeAuthModal);
 
-  $("#authForm").addEventListener("submit", (e) => {
+  $("#tabController").addEventListener("click", () => {
+    setAuthMode("controller");
+    setTimeout(() => $("#authId").focus(), 30);
+  });
+  $("#tabOwner").addEventListener("click", () => {
+    setAuthMode("owner");
+    setTimeout(() => $("#ownerPin").focus(), 30);
+  });
+
+  $("#controllerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const ok = signIn($("#authId").value, $("#authPin").value);
+    const ok = await signInController($("#authId").value, $("#authPin").value);
+    if (ok) navigate("admin");
+  });
+
+  $("#ownerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ok = await signInOwner($("#ownerPin").value);
     if (ok) navigate("admin");
   });
 
   $("#authModal").addEventListener("click", (e) => {
     if (e.target === $("#authModal")) closeAuthModal();
+  });
+
+  $("#createAccountForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ok = await createControllerAccount($("#newCtrlId").value, $("#newCtrlPin").value);
+    if (ok) e.target.reset();
+  });
+
+  $("#accountList")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-revoke]");
+    if (!btn) return;
+    revokeControllerAccount(btn.dataset.revoke);
   });
 
   $("#thresholdForm").addEventListener("submit", (e) => {
@@ -1078,7 +1286,7 @@ function setupEvents() {
   $("#operatorSelect").addEventListener("change", (e) => {
     state.admin.operatorId = e.target.value;
     saveAdmin();
-    toast(`Signed in as ${currentOperator().name}`);
+    toast(`Duty name set to ${currentOperator().name}`);
   });
 
   $("#autoSmsToggle").addEventListener("click", () => {

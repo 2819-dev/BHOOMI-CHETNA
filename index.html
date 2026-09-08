@@ -25,12 +25,12 @@
         </div>
         <div>
           <h1>BHOOMI CHETNA</h1>
-          <p class="live-line"><span class="status-dot"></span> Simulated feed · ASDMA demo</p>
+          <p class="live-line"><span class="status-dot"></span> Simulated feed · ASDMA console</p>
         </div>
       </div>
 
       <div class="topbar-actions">
-        <span class="demo-chip" title="Values are demonstration data, not a live ASDMA production feed">Demo data</span>
+        <span class="demo-chip" title="Values are simulated client-side data, not a live ASDMA production feed">Simulated data</span>
         <label class="district-select">
           <span class="sr-only">District Focus</span>
           <div class="select-shell">
@@ -215,18 +215,18 @@
 
         <article class="card controls-card" id="broadcastCard">
           <p class="card-label">Emergency Broadcast</p>
-          <p class="meta" id="broadcastLockNote">Controller sign-in required to operate sirens or SMS.</p>
+          <p class="meta" id="broadcastLockNote">Sign in required to operate sirens or SMS.</p>
           <div class="controls" id="broadcastControls">
             <button class="control-btn siren" type="button" id="sirenBtn" disabled>
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10v4h3l5 4V6L7 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>
-              <span>Activate Siren (demo)</span>
+              <span>Activate Siren</span>
             </button>
             <button class="control-btn sms" type="button" id="smsBtn" disabled>
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3V5Z"/></svg>
-              <span>Send SMS Alert (demo)</span>
+              <span>Send SMS Alert</span>
             </button>
           </div>
-          <p class="control-note" id="controlNote">Demonstration controls · not linked to field hardware or SMS carriers</p>
+          <p class="control-note" id="controlNote">Sign in required · not linked to field hardware or SMS carriers</p>
           <ul class="broadcast-log" id="broadcastLog"></ul>
         </article>
       </section>
@@ -237,13 +237,32 @@
           <div>
             <p class="card-label">ASDMA Control Desk</p>
             <h2 class="admin-title">Administrator Panel</h2>
-            <p class="meta">Restricted to signed-in controllers. Thresholds and roster save in this browser only.</p>
+            <p class="meta">Restricted to signed-in owner or controllers. Thresholds and roster save in this browser only.</p>
           </div>
           <div class="admin-operator">
-            <label for="operatorSelect">Signed in as (sample)</label>
+            <label for="operatorSelect">Duty roster name</label>
             <select id="operatorSelect" aria-label="Duty operator"></select>
           </div>
         </div>
+
+        <article class="card" id="accountsCard" hidden>
+          <div class="card-head">
+            <p class="card-label">Controller Accounts</p>
+            <span class="count-pill soft">Owner only</span>
+          </div>
+          <p class="meta">Create ID + PIN accounts for controllers. Share PINs out of band. No public demo credentials.</p>
+          <form class="officer-form" id="createAccountForm">
+            <label>Controller ID
+              <input type="text" id="newCtrlId" required maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" autocomplete="off" />
+            </label>
+            <label>PIN
+              <input type="password" id="newCtrlPin" required minlength="8" maxlength="128" autocomplete="new-password" />
+            </label>
+            <button type="submit" class="btn solid">Create account</button>
+          </form>
+          <p class="meta" id="accountEmpty">No controller accounts yet.</p>
+          <div class="account-list" id="accountList"></div>
+        </article>
 
         <div class="admin-grid">
           <article class="card">
@@ -261,12 +280,12 @@
           <article class="card">
             <p class="card-label">Sensor Maintenance</p>
             <div class="admin-sensor-list" id="adminSensorList"></div>
-            <p class="meta">Toggle maintenance to take a demonstration node offline.</p>
+            <p class="meta">Toggle maintenance to take a node offline in this session.</p>
           </article>
 
           <article class="card">
             <div class="card-head">
-              <p class="card-label">Sample Duty Roster</p>
+              <p class="card-label">Duty Roster</p>
               <span class="count-pill soft" id="officerCount">0 on roster</span>
             </div>
             <form class="officer-form" id="officerForm">
@@ -278,7 +297,7 @@
               </label>
               <button type="submit" class="btn solid">Add</button>
             </form>
-            <p class="meta">Names below are sample entries for the demo roster.</p>
+            <p class="meta">Local roster names for broadcast attribution in this browser.</p>
             <ul class="officer-list" id="officerList"></ul>
           </article>
 
@@ -287,14 +306,14 @@
             <div class="toggle-row">
               <div>
                 <strong>Auto SMS on high risk</strong>
-                <p class="meta">Queues a demonstration SMS log entry when high risk is crossed. No carrier send.</p>
+                <p class="meta">Queues an SMS log entry when high risk is crossed. No carrier send.</p>
               </div>
               <button type="button" class="toggle" id="autoSmsToggle" aria-pressed="false">Off</button>
             </div>
             <div class="toggle-row">
               <div>
                 <strong>Community siren arming</strong>
-                <p class="meta">Allows Relief siren controls in this demo. Not linked to field sirens.</p>
+                <p class="meta">Allows Relief siren controls. Not linked to field sirens.</p>
               </div>
               <button type="button" class="toggle on" id="sirenArmToggle" aria-pressed="true">On</button>
             </div>
@@ -337,21 +356,37 @@
   </div>
 
   <div class="modal" id="authModal" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-      <h2 id="authTitle">Controller sign-in</h2>
-      <p class="meta">Admin panel and broadcast controls are restricted to signed-in controllers.</p>
-      <form class="auth-form" id="authForm">
+    <div class="modal-card auth-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <h2 id="authTitle">Secure sign-in</h2>
+      <p class="meta">Admin and broadcast controls require authenticated access. There are no public demo credentials.</p>
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" data-auth-mode="controller" id="tabController">Controller</button>
+        <button type="button" class="auth-tab" data-auth-mode="owner" id="tabOwner">Owner</button>
+      </div>
+
+      <form class="auth-form" id="controllerForm">
         <label>Controller ID
-          <input type="text" id="authId" autocomplete="username" required maxlength="32" />
+          <input type="text" id="authId" autocomplete="username" required maxlength="48" />
         </label>
-        <label>Access PIN
-          <input type="password" id="authPin" autocomplete="current-password" required maxlength="32" />
+        <label>PIN
+          <input type="password" id="authPin" autocomplete="current-password" required maxlength="128" />
         </label>
-        <p class="auth-hint"><strong>Demo credentials (placeholder for live ASDMA SSO):</strong> ID <code>controller</code> · PIN <code>ASDMA26</code></p>
         <p class="auth-error" id="authError" hidden>Invalid controller ID or PIN.</p>
         <div class="modal-actions">
           <button type="button" class="btn ghost" id="authCancel">Cancel</button>
           <button type="submit" class="btn solid">Sign in</button>
+        </div>
+      </form>
+
+      <form class="auth-form" id="ownerForm" hidden>
+        <label>Owner master PIN
+          <textarea id="ownerPin" rows="3" spellcheck="false" autocomplete="off" required placeholder="Paste owner master PIN"></textarea>
+        </label>
+        <p class="meta">Use the private master PIN issued to the system owner. It is verified by hash only; the PIN itself is never stored in the app.</p>
+        <p class="auth-error" id="ownerError" hidden>Invalid owner master PIN.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="ownerCancel">Cancel</button>
+          <button type="submit" class="btn solid">Unlock as owner</button>
         </div>
       </form>
     </div>
