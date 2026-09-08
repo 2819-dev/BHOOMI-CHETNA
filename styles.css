@@ -120,6 +120,21 @@ button, select { font: inherit; color: inherit; }
   gap: 8px;
 }
 
+.demo-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  border: 1px solid #5a4a22;
+  background: #2a2314;
+  color: #d4c08a;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .select-shell {
   position: relative;
   display: flex;
@@ -1227,6 +1242,15 @@ button, select { font: inherit; color: inherit; }
   grid-template-columns: 1fr 1fr auto;
   gap: 8px;
   margin: 10px 0;
+  align-items: end;
+}
+
+.officer-form label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {
@@ -1313,6 +1337,7 @@ button, select { font: inherit; color: inherit; }
 }
 
 @media (max-width: 520px) {
-  .select-shell select { max-width: 136px; font-size: 0.75rem; }
+  .select-shell select { max-width: 120px; font-size: 0.75rem; }
+  .demo-chip { display: none; }
   .app { border: 0; }
 }

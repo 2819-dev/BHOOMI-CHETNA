@@ -23,14 +23,14 @@ const DISTRICT_DATA = {
     ],
     route: {
       title: "Primary Route",
-      path: "Chandmari → Zoo Road → Shelter A",
+      path: "Chandmari → Zoo Road → Dispur Community Hall",
       eta: "14 min",
       steps: ["Assemble at Chandmari muster point", "Follow Zoo Road corridor (marked)", "Check in at Dispur Community Hall"],
     },
     shelters: [
-      { name: "Relief Shelter A", place: "Dispur Community Hall", capacity: 420, occupied: 186, dist: "2.4 km" },
-      { name: "Relief Shelter B", place: "Latasil Ground Camp", capacity: 280, occupied: 94, dist: "3.1 km" },
-      { name: "Relief Shelter C", place: "Chandmari School Block", capacity: 160, occupied: 42, dist: "1.1 km" },
+      { name: "Dispur Community Hall", place: "Dispur, Guwahati", capacity: 420, occupied: 186, dist: "2.4 km" },
+      { name: "Latasil Ground Camp", place: "Latasil, Guwahati", capacity: 280, occupied: 94, dist: "3.1 km" },
+      { name: "Chandmari School Block", place: "Chandmari, Guwahati", capacity: 160, occupied: 42, dist: "1.1 km" },
     ],
     trend7: [42, 48, 51, 55, 63, 71, 78],
     trend30: [30, 34, 38, 41, 45, 48, 52, 49, 55, 58, 60, 57, 62, 66, 70, 68, 72, 69, 74, 71, 73, 76, 74, 77, 75, 78, 80, 79, 77, 78],
@@ -58,13 +58,13 @@ const DISTRICT_DATA = {
     ],
     route: {
       title: "Primary Route",
-      path: "Haflong Bazaar → NH-27 → Shelter Alpha",
+      path: "Haflong Bazaar → NH-27 → Haflong Town Hall",
       eta: "18 min",
-      steps: ["Leave hillside settlements via signed egress", "Merge onto NH-27 southbound", "Report at Haflong Town Hall shelter"],
+      steps: ["Leave hillside settlements via signed egress", "Merge onto NH-27 southbound", "Report at Haflong Town Hall"],
     },
     shelters: [
-      { name: "Shelter Alpha", place: "Haflong Town Hall", capacity: 350, occupied: 120, dist: "3.2 km" },
-      { name: "Shelter Beta", place: "Mahur Community Centre", capacity: 200, occupied: 55, dist: "5.4 km" },
+      { name: "Haflong Town Hall", place: "Haflong, Dima Hasao", capacity: 350, occupied: 120, dist: "3.2 km" },
+      { name: "Mahur Community Centre", place: "Mahur, Dima Hasao", capacity: 200, occupied: 55, dist: "5.4 km" },
     ],
     trend7: [38, 41, 44, 49, 53, 57, 61],
     trend30: [25, 28, 30, 33, 36, 35, 39, 42, 40, 44, 47, 45, 48, 50, 52, 51, 54, 53, 55, 57, 56, 58, 59, 58, 60, 59, 61, 60, 62, 61],
@@ -92,13 +92,13 @@ const DISTRICT_DATA = {
     ],
     route: {
       title: "Standby Route",
-      path: "Silchar Ring → Tarapur → Shelter North",
+      path: "Silchar Ring → Tarapur → Silchar Indoor Stadium",
       eta: "12 min",
       steps: ["Use Tarapur connector if advisory escalates", "Avoid soft-cut shoulders after heavy rain", "Check in at Silchar Indoor Stadium"],
     },
     shelters: [
-      { name: "Shelter North", place: "Silchar Indoor Stadium", capacity: 500, occupied: 40, dist: "2.8 km" },
-      { name: "Shelter East", place: "Tarapur High School", capacity: 220, occupied: 18, dist: "4.1 km" },
+      { name: "Silchar Indoor Stadium", place: "Silchar, Cachar", capacity: 500, occupied: 40, dist: "2.8 km" },
+      { name: "Tarapur High School", place: "Tarapur, Cachar", capacity: 220, occupied: 18, dist: "4.1 km" },
     ],
     trend7: [40, 38, 36, 35, 33, 34, 34],
     trend30: [45, 44, 42, 41, 40, 39, 38, 40, 37, 36, 35, 34, 36, 35, 33, 34, 32, 33, 35, 34, 33, 32, 34, 35, 33, 34, 33, 34, 35, 34],
@@ -126,13 +126,13 @@ const DISTRICT_DATA = {
     ],
     route: {
       title: "Primary Route",
-      path: "Diphu Ridge → Stadium Road → Shelter Central",
+      path: "Diphu Ridge → Stadium Road → Diphu Indoor Stadium",
       eta: "11 min",
       steps: ["Immediate departure from KA-1 / KA-4 corridors", "Use Stadium Road only", "Register at Diphu Indoor Stadium"],
     },
     shelters: [
-      { name: "Shelter Central", place: "Diphu Indoor Stadium", capacity: 480, occupied: 310, dist: "1.9 km" },
-      { name: "Shelter West", place: "Hamren Relief Camp", capacity: 240, occupied: 150, dist: "3.6 km" },
+      { name: "Diphu Indoor Stadium", place: "Diphu, Karbi Anglong", capacity: 480, occupied: 310, dist: "1.9 km" },
+      { name: "Hamren Relief Camp", place: "Hamren, Karbi Anglong", capacity: 240, occupied: 150, dist: "3.6 km" },
     ],
     trend7: [48, 55, 60, 68, 74, 79, 82],
     trend30: [32, 35, 38, 40, 44, 47, 50, 48, 52, 55, 58, 60, 59, 63, 66, 68, 70, 69, 72, 74, 73, 76, 78, 77, 79, 80, 81, 80, 82, 82],
@@ -150,9 +150,9 @@ const DEFAULT_ADMIN = {
   sirenArmed: true,
   operatorId: "op-1",
   officers: [
-    { id: "op-1", name: "R. Sharma", role: "ASDMA Controller" },
-    { id: "op-2", name: "M. Das", role: "District Officer · Kamrup Metro" },
-    { id: "op-3", name: "P. Teron", role: "Field Lead · Karbi Anglong" },
+    { id: "op-1", name: "Sample Controller", role: "ASDMA Controller (sample)" },
+    { id: "op-2", name: "Sample District Officer", role: "District Officer · Kamrup Metro (sample)" },
+    { id: "op-3", name: "Sample Field Lead", role: "Field Lead · Karbi Anglong (sample)" },
   ],
   maintenance: {},
   archive: [],
@@ -222,8 +222,8 @@ function cloneLive(key) {
 
 function formatUpdated(ms) {
   const sec = Math.max(1, Math.round((Date.now() - ms) / 1000));
-  if (sec < 60) return `Updated ${sec}s ago`;
-  return `Updated ${Math.round(sec / 60)}m ago`;
+  if (sec < 60) return `Simulated · updated ${sec}s ago`;
+  return `Simulated · updated ${Math.round(sec / 60)}m ago`;
 }
 
 function toast(message) {
@@ -306,7 +306,7 @@ function mapMarkup(d, canvasId) {
       <g class="zones layer-risk">${riskEllipses}</g>
       <g class="routes layer-routes" opacity="0">${routePaths}</g>
       <g class="sensors layer-sensors">${sensorPins}</g>
-      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.06em">ASSAM · NORTHEAST INDIA</text>
+      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.06em">ASSAM · SCHEMATIC MAP (DEMO)</text>
       <text x="20" y="52" fill="#E6EBF2" font-size="14" font-family="Barlow, IBM Plex Sans, sans-serif" font-weight="700">${d.name}</text>
     </svg>
     <div class="map-legend">
@@ -352,7 +352,7 @@ function renderMaps() {
   const detail = $("#mapDetail");
   const top = [...d.zones].sort((a, b) => b.score - a.score)[0];
   detail.innerHTML = `<h3>${top.title}</h3>
-    <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Layer view: <strong>${state.layer}</strong>. Toggle Risk, Sensors, or Routes above the map.</p>`;
+    <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Schematic overlay: <strong>${state.layer}</strong>. Map is illustrative, not live GIS imagery.</p>`;
 }
 
 function renderTrend() {
@@ -515,15 +515,15 @@ function renderSensors() {
     .join("");
 
   const health = [
-    { label: "Uplink", value: Math.round((online / d.sensors.length) * 100), color: "var(--safe)" },
-    { label: "Battery", value: 88 - offline * 8, color: "var(--info)" },
-    { label: "Signal", value: 92 - warn * 10, color: "var(--watch)" },
+    { label: "Nodes up", value: Math.round((online / Math.max(d.sensors.length, 1)) * 100), color: "var(--safe)" },
+    { label: "Degraded", value: Math.round((warn / Math.max(d.sensors.length, 1)) * 100), color: "var(--watch)" },
+    { label: "Offline", value: Math.round((offline / Math.max(d.sensors.length, 1)) * 100), color: "var(--danger)" },
   ];
   $("#healthBars").innerHTML = health
     .map(
       (h) => `<div class="health-row">
       <span>${h.label}</span>
-      <div class="bar"><span style="width:${h.value}%;background:${h.color}"></span></div>
+      <div class="bar"><span style="width:${Math.max(h.value, 2)}%;background:${h.color}"></span></div>
       <em>${h.value}%</em>
     </div>`
     )
@@ -531,7 +531,7 @@ function renderSensors() {
 
   $("#telemetryList").innerHTML = d.sensors
     .map((s) => {
-      const reading = s.status === "offline" ? "No signal" : `${s.value}${s.unit}`;
+      const reading = s.status === "offline" ? "No signal (demo)" : `${s.value}${s.unit}`;
       return `<li>
         <span class="z-dot ${s.status === "online" ? "green" : s.status === "warn" ? "amber" : "red"}"></span>
         <div><strong>${s.id} · ${s.name}</strong><p>${formatUpdated(state.updatedAt)}</p></div>
@@ -585,25 +585,29 @@ function renderRelief() {
 
   const siren = $("#sirenBtn");
   siren.classList.toggle("active-siren", state.sirenOn);
-  siren.querySelector("span").textContent = state.sirenOn ? "Siren Active" : "Activate Siren";
+  siren.querySelector("span").textContent = state.sirenOn ? "Siren Active (demo)" : "Activate Siren (demo)";
   $("#controlNote").textContent = state.sirenOn
-    ? `Sirens sounding in ${d.name}. Controllers remain logged.`
-    : "Authorized for ASDMA and district controllers only";
+    ? `Demo siren active for ${d.name}. Not linked to field hardware.`
+    : "Demonstration controls · not linked to field hardware or SMS carriers";
 }
 
 function buildNotifications() {
+  const agesMin = [12, 28, 41];
+  let i = 0;
   const items = Object.entries(DISTRICT_DATA).flatMap(([key, d]) => {
     const lvl = levelFromScore(d.score);
     if (lvl.cls === "safe") return [];
     const top = [...d.zones].sort((a, b) => b.score - a.score)[0];
+    const age = agesMin[i % agesMin.length];
+    i += 1;
     return [
       {
         id: `${key}-${top.id}`,
         district: key,
         title: `${lvl.level} · ${d.name}`,
-        body: `${top.title} scored ${top.score}. ${top.action} recommended.`,
+        body: `${top.title} scored ${top.score}. ${top.action} recommended. (Demo alert)`,
         unread: true,
-        at: Date.now() - Math.round(Math.random() * 40) * 60000,
+        at: Date.now() - age * 60000,
       },
     ];
   });
@@ -826,8 +830,8 @@ function tickLive() {
   }
 
   if (state.lastRiskClass !== "high" && lvl.cls === "high" && state.admin.autoSms) {
-    logBroadcast(`Auto SMS queued for ${d.name} high-risk crossing`);
-    toast(`Auto SMS queued for ${d.name}`);
+    logBroadcast(`Demo auto SMS queued for ${d.name} high-risk crossing`);
+    toast(`Demo auto SMS queued for ${d.name}`);
   }
   state.lastRiskClass = lvl.cls;
 
@@ -852,7 +856,7 @@ function setupEvents() {
       const detail = $("#mapDetail");
       const top = [...state.live.zones].sort((a, b) => b.score - a.score)[0];
       detail.innerHTML = `<h3>${top.title}</h3>
-        <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Layer view: <strong>${state.layer}</strong>.</p>`;
+        <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Schematic overlay: <strong>${state.layer}</strong>. Map is illustrative, not live GIS imagery.</p>`;
       toast(`${state.layer[0].toUpperCase()}${state.layer.slice(1)} layer shown`);
     });
   });
@@ -909,27 +913,27 @@ function setupEvents() {
       return;
     }
     const ok = await confirmAction({
-      title: "Activate community sirens?",
-      body: `This sounds audible warnings across ${state.live.name}. The action is logged for ASDMA controllers.`,
-      confirmLabel: "Activate Siren",
+      title: "Activate demo community sirens?",
+      body: `This only logs a demonstration siren event for ${state.live.name}. It does not trigger field hardware.`,
+      confirmLabel: "Activate Demo Siren",
     });
     if (!ok) return;
     state.sirenOn = true;
-    logBroadcast(`Sirens activated in ${state.live.name}`);
-    toast("Sirens activated");
+    logBroadcast(`Demo sirens activated in ${state.live.name}`);
+    toast("Demo sirens activated");
     renderRelief();
   });
 
   $("#smsBtn").addEventListener("click", async () => {
-    const recipients = 1200 + Math.round(Math.random() * 800);
+    const recipients = state.live.shelters.reduce((sum, s) => sum + s.capacity, 0);
     const ok = await confirmAction({
-      title: "Send SMS alert?",
-      body: `Send landslide advisory SMS to about ${recipients.toLocaleString("en-IN")} registered residents and response teams in ${state.live.name}.`,
-      confirmLabel: "Send SMS",
+      title: "Queue demonstration SMS?",
+      body: `This logs an SMS advisory for about ${recipients.toLocaleString("en-IN")} shelter-capacity contacts in ${state.live.name}. No message is sent to carriers.`,
+      confirmLabel: "Queue Demo SMS",
     });
     if (!ok) return;
-    logBroadcast(`SMS advisory queued · ${recipients.toLocaleString("en-IN")} recipients`);
-    toast("SMS alert queued");
+    logBroadcast(`Demo SMS queued · ${recipients.toLocaleString("en-IN")} capacity contacts`);
+    toast("Demo SMS queued (not sent)");
   });
 
   $("#thresholdForm").addEventListener("submit", (e) => {

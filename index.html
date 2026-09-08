@@ -25,11 +25,12 @@
         </div>
         <div>
           <h1>BHOOMI CHETNA</h1>
-          <p class="live-line"><span class="status-dot"></span> Live feed · ASDMA</p>
+          <p class="live-line"><span class="status-dot"></span> Simulated feed · ASDMA demo</p>
         </div>
       </div>
 
       <div class="topbar-actions">
+        <span class="demo-chip" title="Values are demonstration data, not a live ASDMA production feed">Demo data</span>
         <label class="district-select">
           <span class="sr-only">District Focus</span>
           <div class="select-shell">
@@ -72,7 +73,7 @@
         <div class="home-layout">
           <section class="map-panel" aria-label="Live geo-hazard map">
             <div class="map-chrome">
-              <span class="map-title">Live Geo-Hazard Map</span>
+              <span class="map-title">Schematic Geo-Hazard Map</span>
               <div class="map-toggles" id="mapTogglesHome">
                 <button class="chip active" type="button" data-layer="risk">Risk</button>
                 <button class="chip" type="button" data-layer="sensors">Sensors</button>
@@ -89,7 +90,7 @@
                 <div class="score-ring" id="scoreRing" style="--p:78"><strong id="scoreValue">78</strong></div>
                 <div>
                   <p class="level high" id="riskLevel">HIGH RISK</p>
-                  <p class="meta" id="riskMeta">Confidence 91% · Updated just now</p>
+                  <p class="meta" id="riskMeta">Confidence 91% · Simulated reading</p>
                 </div>
               </div>
             </article>
@@ -151,7 +152,7 @@
                 </svg>
                 <div class="trend-labels" id="trendLabels"></div>
               </div>
-              <p class="meta" id="trendMeta"></p>
+              <p class="meta" id="trendMeta">Historical series from demonstration dataset.</p>
             </article>
           </div>
         </div>
@@ -161,7 +162,7 @@
       <section class="view" id="view-map" data-view="map" aria-label="Full map" hidden>
         <div class="map-panel map-panel-full">
           <div class="map-chrome">
-            <span class="map-title">District Hazard Map</span>
+            <span class="map-title">District Schematic Map</span>
             <div class="map-toggles" id="mapTogglesFull">
               <button class="chip active" type="button" data-layer="risk">Risk</button>
               <button class="chip" type="button" data-layer="sensors">Sensors</button>
@@ -178,14 +179,14 @@
         <div class="card">
           <div class="card-head">
             <p class="card-label">IoT Sensor Network</p>
-            <span class="live-tag"><span class="status-dot"></span> Telemetry live</span>
+            <span class="live-tag"><span class="status-dot"></span> Simulated telemetry</span>
           </div>
           <div class="sensor-summary" id="sensorSummary"></div>
           <div class="sensor-grid sensor-grid-lg" id="sensorGrid"></div>
         </div>
         <div class="grid-2">
           <article class="card">
-            <p class="card-label">Network Health</p>
+            <p class="card-label">Network Mix</p>
             <div class="health-bars" id="healthBars"></div>
           </article>
           <article class="card">
@@ -216,14 +217,14 @@
           <div class="controls">
             <button class="control-btn siren" type="button" id="sirenBtn">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10v4h3l5 4V6L7 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>
-              <span>Activate Siren</span>
+              <span>Activate Siren (demo)</span>
             </button>
             <button class="control-btn sms" type="button" id="smsBtn">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3V5Z"/></svg>
-              <span>Send SMS Alert</span>
+              <span>Send SMS Alert (demo)</span>
             </button>
           </div>
-          <p class="control-note" id="controlNote">Authorized for ASDMA and district controllers</p>
+          <p class="control-note" id="controlNote">Demonstration controls · not linked to field hardware or SMS carriers</p>
           <ul class="broadcast-log" id="broadcastLog"></ul>
         </article>
       </section>
@@ -234,10 +235,10 @@
           <div>
             <p class="card-label">ASDMA Control Desk</p>
             <h2 class="admin-title">Administrator Panel</h2>
-            <p class="meta">Thresholds, sensors, duty officers, and broadcast records for BHOOMI CHETNA.</p>
+            <p class="meta">Demonstration control desk. Thresholds and roster save in this browser only.</p>
           </div>
           <div class="admin-operator">
-            <label for="operatorSelect">Signed in as</label>
+            <label for="operatorSelect">Signed in as (sample)</label>
             <select id="operatorSelect" aria-label="Duty operator"></select>
           </div>
         </div>
@@ -252,25 +253,30 @@
               <label>Soil moisture alert (%) <input type="number" id="thrSoil" min="1" max="100" required /></label>
               <button type="submit" class="btn solid">Save Thresholds</button>
             </form>
-            <p class="meta" id="thresholdNote"></p>
+            <p class="meta" id="thresholdNote">Loading thresholds…</p>
           </article>
 
           <article class="card">
             <p class="card-label">Sensor Maintenance</p>
             <div class="admin-sensor-list" id="adminSensorList"></div>
-            <p class="meta">Toggle maintenance to take a node offline without deleting it from the district roster.</p>
+            <p class="meta">Toggle maintenance to take a demonstration node offline.</p>
           </article>
 
           <article class="card">
             <div class="card-head">
-              <p class="card-label">Duty Officers</p>
-              <span class="count-pill soft" id="officerCount"></span>
+              <p class="card-label">Sample Duty Roster</p>
+              <span class="count-pill soft" id="officerCount">0 on roster</span>
             </div>
             <form class="officer-form" id="officerForm">
-              <input type="text" id="officerName" placeholder="Full name" required maxlength="48" />
-              <input type="text" id="officerRole" placeholder="Role" required maxlength="40" />
+              <label>Full name
+                <input type="text" id="officerName" required maxlength="48" autocomplete="name" />
+              </label>
+              <label>Role
+                <input type="text" id="officerRole" required maxlength="40" autocomplete="organization-title" />
+              </label>
               <button type="submit" class="btn solid">Add</button>
             </form>
+            <p class="meta">Names below are sample entries for the demo roster.</p>
             <ul class="officer-list" id="officerList"></ul>
           </article>
 
@@ -279,14 +285,14 @@
             <div class="toggle-row">
               <div>
                 <strong>Auto SMS on high risk</strong>
-                <p class="meta">Queue advisory SMS when a district crosses the high-risk band.</p>
+                <p class="meta">Queues a demonstration SMS log entry when high risk is crossed. No carrier send.</p>
               </div>
               <button type="button" class="toggle" id="autoSmsToggle" aria-pressed="false">Off</button>
             </div>
             <div class="toggle-row">
               <div>
                 <strong>Community siren arming</strong>
-                <p class="meta">Allow district controllers to arm sirens from Relief.</p>
+                <p class="meta">Allows Relief siren controls in this demo. Not linked to field sirens.</p>
               </div>
               <button type="button" class="toggle on" id="sirenArmToggle" aria-pressed="true">On</button>
             </div>

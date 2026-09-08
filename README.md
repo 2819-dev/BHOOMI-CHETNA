@@ -1,8 +1,8 @@
 # BHOOMI CHETNA
 
-Landslide early warning system for Assam State Disaster Management Authority (ASDMA).
+Landslide early warning demonstration for Assam State Disaster Management Authority (ASDMA).
 
-For district authorities, emergency response teams, and local communities.
+Sensor readings, risk scores, maps, sirens, and SMS actions in this build are **demo / simulated data**. They are not connected to live ASDMA production feeds or field hardware.
 
 ## Focus districts
 
@@ -10,14 +10,14 @@ Guwahati Hills · Dima Hasao · Cachar · Karbi Anglong
 
 ## Includes
 
-- Live geo-hazard mapping with risk, sensor, and route layers
+- Schematic geo-hazard mapping with risk, sensor, and route layers
 - Landslide risk scoring and model prediction
-- IoT sensor status with live telemetry
+- Simulated IoT sensor telemetry
 - Rainfall and soil moisture monitoring
 - High-risk zone identification and emergency alerts
 - Evacuation routes and nearby relief shelters
-- Siren and SMS broadcast controls
+- Demonstration siren and SMS controls
 - Historical risk trends
-- Administrator panel for thresholds, sensor maintenance, duty officers, and broadcast archive
+- Administrator panel for thresholds, sensor maintenance, sample duty roster, and broadcast archive
 
 Netlify publishes the repository root.
