@@ -65,7 +65,7 @@ const districts = {
     aiMeta: "Next model refresh in 15 min",
     rain: 28,
     soil: 41,
-    pill: { label: "Zone CA-2", text: "STABLE", cls: "watch" },
+    pill: { label: "Zone CA-2", text: "STABLE", cls: "safe" },
     zones: [
       { tone: "green", title: "CA-2 Silchar Bench", detail: "Score 31 · Stable", dist: "1.5 km" },
       { tone: "green", title: "CA-4 Barak Escarpment", detail: "Score 38 · Stable", dist: "3.8 km" },
