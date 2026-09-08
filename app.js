@@ -140,6 +140,13 @@ const DISTRICT_DATA = {
 };
 
 const ADMIN_KEY = "bhoomi-chetna-admin-v1";
+const AUTH_KEY = "bhoomi-chetna-auth-v1";
+
+/** Demo-only credentials. Replace with ASDMA SSO / IAM in production. */
+const DEMO_AUTH = {
+  id: "controller",
+  pin: "ASDMA26",
+};
 
 const DEFAULT_ADMIN = {
   highScore: 70,
@@ -184,6 +191,7 @@ const state = {
   live: null,
   admin: loadAdmin(),
   lastRiskClass: null,
+  authed: sessionStorage.getItem(AUTH_KEY) === "1",
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -583,12 +591,21 @@ function renderRelief() {
         .join("")
     : `<li>No broadcasts issued this session.</li>`;
 
+  const locked = !state.authed;
+  $("#broadcastControls").classList.toggle("locked", locked);
+  $("#sirenBtn").disabled = locked;
+  $("#smsBtn").disabled = locked;
+  $("#broadcastLockNote").hidden = !locked;
+  $("#broadcastLockNote").textContent = "Controller sign-in required to operate sirens or SMS.";
+
   const siren = $("#sirenBtn");
   siren.classList.toggle("active-siren", state.sirenOn);
   siren.querySelector("span").textContent = state.sirenOn ? "Siren Active (demo)" : "Activate Siren (demo)";
-  $("#controlNote").textContent = state.sirenOn
-    ? `Demo siren active for ${d.name}. Not linked to field hardware.`
-    : "Demonstration controls · not linked to field hardware or SMS carriers";
+  $("#controlNote").textContent = !state.authed
+    ? "Sign in as a controller to unlock demonstration broadcast controls."
+    : state.sirenOn
+      ? `Demo siren active for ${d.name}. Not linked to field hardware.`
+      : "Demonstration controls · not linked to field hardware or SMS carriers";
 }
 
 function buildNotifications() {
@@ -726,14 +743,72 @@ function renderAdmin() {
     : `<li>No broadcast records yet.</li>`;
 }
 
+function syncAuthUI() {
+  const btn = $("#authBtn");
+  const adminTab = $("#adminTab");
+  const tabbar = $(".tabbar");
+  if (state.authed) {
+    const op = currentOperator();
+    btn.textContent = `Sign out · ${op.name.split(" ")[0]}`;
+    btn.classList.add("signed-in");
+    btn.title = `Signed in as ${op.name}`;
+    adminTab.hidden = false;
+    tabbar.classList.add("authed");
+  } else {
+    btn.textContent = "Controller sign-in";
+    btn.classList.remove("signed-in");
+    btn.title = "Sign in to access Admin and broadcast controls";
+    adminTab.hidden = true;
+    tabbar.classList.remove("authed");
+  }
+}
+
+function openAuthModal() {
+  $("#authError").hidden = true;
+  $("#authId").value = "";
+  $("#authPin").value = "";
+  $("#authModal").hidden = false;
+  setTimeout(() => $("#authId").focus(), 50);
+}
+
+function closeAuthModal() {
+  $("#authModal").hidden = true;
+}
+
+function signIn(id, pin) {
+  if (id.trim() === DEMO_AUTH.id && pin === DEMO_AUTH.pin) {
+    state.authed = true;
+    sessionStorage.setItem(AUTH_KEY, "1");
+    closeAuthModal();
+    syncAuthUI();
+    renderRelief();
+    toast("Controller signed in");
+    return true;
+  }
+  $("#authError").hidden = false;
+  return false;
+}
+
+function signOut() {
+  const wasAdmin = state.view === "admin";
+  state.authed = false;
+  state.sirenOn = false;
+  sessionStorage.removeItem(AUTH_KEY);
+  syncAuthUI();
+  renderRelief();
+  if (wasAdmin) navigate("home");
+  toast("Controller signed out");
+}
+
 function renderAll() {
   renderMaps();
   renderHome();
   renderSensors();
   renderRelief();
   renderNotifications();
-  renderAdmin();
+  if (state.authed) renderAdmin();
   syncLayerChips();
+  syncAuthUI();
 }
 
 function setDistrict(key) {
@@ -745,6 +820,11 @@ function setDistrict(key) {
 }
 
 function navigate(view) {
+  if (view === "admin" && !state.authed) {
+    openAuthModal();
+    toast("Controller sign-in required for Admin");
+    return;
+  }
   state.view = view;
   $$(".view").forEach((v) => {
     const active = v.dataset.view === view;
@@ -901,6 +981,11 @@ function setupEvents() {
   });
 
   $("#sirenBtn").addEventListener("click", async () => {
+    if (!state.authed) {
+      openAuthModal();
+      toast("Controller sign-in required");
+      return;
+    }
     if (!state.admin.sirenArmed && !state.sirenOn) {
       toast("Siren arming is disabled in Admin");
       return;
@@ -925,6 +1010,11 @@ function setupEvents() {
   });
 
   $("#smsBtn").addEventListener("click", async () => {
+    if (!state.authed) {
+      openAuthModal();
+      toast("Controller sign-in required");
+      return;
+    }
     const recipients = state.live.shelters.reduce((sum, s) => sum + s.capacity, 0);
     const ok = await confirmAction({
       title: "Queue demonstration SMS?",
@@ -934,6 +1024,23 @@ function setupEvents() {
     if (!ok) return;
     logBroadcast(`Demo SMS queued · ${recipients.toLocaleString("en-IN")} capacity contacts`);
     toast("Demo SMS queued (not sent)");
+  });
+
+  $("#authBtn").addEventListener("click", () => {
+    if (state.authed) signOut();
+    else openAuthModal();
+  });
+
+  $("#authCancel").addEventListener("click", closeAuthModal);
+
+  $("#authForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const ok = signIn($("#authId").value, $("#authPin").value);
+    if (ok) navigate("admin");
+  });
+
+  $("#authModal").addEventListener("click", (e) => {
+    if (e.target === $("#authModal")) closeAuthModal();
   });
 
   $("#thresholdForm").addEventListener("submit", (e) => {
@@ -1035,7 +1142,12 @@ function init() {
   setupEvents();
   renderAll();
   const initial = location.hash.replace("#", "");
-  navigate(["home", "map", "sensors", "relief", "admin"].includes(initial) ? initial : "home");
+  if (initial === "admin" && !state.authed) {
+    navigate("home");
+    openAuthModal();
+  } else {
+    navigate(["home", "map", "sensors", "relief", "admin"].includes(initial) ? initial : "home");
+  }
   setInterval(tickLive, 7000);
   setInterval(() => {
     if (state.view === "home") $("#riskMeta").textContent = `Confidence ${state.live.confidence}% · ${formatUpdated(state.updatedAt)}`;

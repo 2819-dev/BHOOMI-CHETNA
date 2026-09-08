@@ -135,6 +135,79 @@ button, select { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
+.auth-btn {
+  border: 1px solid #3d6a82;
+  background: #1a3040;
+  color: #9ecfe3;
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.auth-btn.signed-in {
+  background: #1a3a2c;
+  border-color: #2a5a42;
+  color: #9bc4ae;
+}
+
+.auth-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.auth-form input {
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 9px 10px;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.auth-hint {
+  margin: 0;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: #2a2314;
+  border: 1px solid #5a4a22;
+  color: #d4c08a;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.auth-hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #f0d48a;
+}
+
+.auth-error {
+  margin: 0;
+  color: #e0a0a0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.controls.locked {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.control-btn:disabled {
+  cursor: not-allowed;
+}
+
 .select-shell {
   position: relative;
   display: flex;
@@ -1007,12 +1080,16 @@ button, select { font: inherit; color: inherit; }
   bottom: 0;
   width: min(100%, var(--max));
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 2px;
   padding: 6px 8px max(10px, env(safe-area-inset-bottom));
   background: var(--surface);
   border-top: 1px solid var(--border);
   z-index: 25;
+}
+
+.tabbar.authed {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .tab {
@@ -1337,7 +1414,8 @@ button, select { font: inherit; color: inherit; }
 }
 
 @media (max-width: 520px) {
-  .select-shell select { max-width: 120px; font-size: 0.75rem; }
+  .select-shell select { max-width: 110px; font-size: 0.75rem; }
   .demo-chip { display: none; }
+  .auth-btn { padding: 8px; font-size: 0.68rem; }
   .app { border: 0; }
 }

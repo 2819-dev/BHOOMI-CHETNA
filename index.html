@@ -43,6 +43,7 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </label>
+        <button class="auth-btn" type="button" id="authBtn">Controller sign-in</button>
         <button class="icon-btn" type="button" id="notifBtn" aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 4 2 5.5 2 5.5H4S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
           <span class="badge" id="notifBadge">0</span>
@@ -212,14 +213,15 @@
           <div class="shelter-list" id="shelterList"></div>
         </article>
 
-        <article class="card controls-card">
+        <article class="card controls-card" id="broadcastCard">
           <p class="card-label">Emergency Broadcast</p>
-          <div class="controls">
-            <button class="control-btn siren" type="button" id="sirenBtn">
+          <p class="meta" id="broadcastLockNote">Controller sign-in required to operate sirens or SMS.</p>
+          <div class="controls" id="broadcastControls">
+            <button class="control-btn siren" type="button" id="sirenBtn" disabled>
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10v4h3l5 4V6L7 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>
               <span>Activate Siren (demo)</span>
             </button>
-            <button class="control-btn sms" type="button" id="smsBtn">
+            <button class="control-btn sms" type="button" id="smsBtn" disabled>
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3V5Z"/></svg>
               <span>Send SMS Alert (demo)</span>
             </button>
@@ -235,7 +237,7 @@
           <div>
             <p class="card-label">ASDMA Control Desk</p>
             <h2 class="admin-title">Administrator Panel</h2>
-            <p class="meta">Demonstration control desk. Thresholds and roster save in this browser only.</p>
+            <p class="meta">Restricted to signed-in controllers. Thresholds and roster save in this browser only.</p>
           </div>
           <div class="admin-operator">
             <label for="operatorSelect">Signed in as (sample)</label>
@@ -327,11 +329,32 @@
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V6.5L12 4l7 2.5V19"/><path d="M9 19v-6h6v6"/></svg>
         <span>Relief</span>
       </button>
-      <button class="tab" type="button" data-nav="admin">
+      <button class="tab tab-admin" type="button" data-nav="admin" id="adminTab" hidden>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c0 .6.4 1.2 1 1.5h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
         <span>Admin</span>
       </button>
     </nav>
+  </div>
+
+  <div class="modal" id="authModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <h2 id="authTitle">Controller sign-in</h2>
+      <p class="meta">Admin panel and broadcast controls are restricted to signed-in controllers.</p>
+      <form class="auth-form" id="authForm">
+        <label>Controller ID
+          <input type="text" id="authId" autocomplete="username" required maxlength="32" />
+        </label>
+        <label>Access PIN
+          <input type="password" id="authPin" autocomplete="current-password" required maxlength="32" />
+        </label>
+        <p class="auth-hint"><strong>Demo credentials (placeholder for live ASDMA SSO):</strong> ID <code>controller</code> · PIN <code>ASDMA26</code></p>
+        <p class="auth-error" id="authError" hidden>Invalid controller ID or PIN.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="authCancel">Cancel</button>
+          <button type="submit" class="btn solid">Sign in</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="modal" id="confirmModal" hidden>
