@@ -1,22 +1,28 @@
 # BHOOMI CHETNA
 
-**AI-Powered Landslide Early Warning System for Assam**
+AI-powered landslide early warning system for Assam.
 
-A mobile command dashboard for ASDMA, district disaster-management authorities, emergency response teams, and local communities.
+Built for ASDMA, district disaster-management authorities, emergency response teams, and local communities.
 
-## Focus Districts
+## Focus districts
 
 Guwahati Hills · Dima Hasao · Cachar · Karbi Anglong
 
-## Capabilities
+## Features
 
-- Live geo-hazard mapping with green / yellow / red risk layers  
-- Landslide risk scoring and AI failure-window prediction  
-- Real-time IoT sensor status  
-- Rainfall and soil moisture monitoring  
-- High-risk zone identification  
-- Emergency alerts with siren and SMS controls  
-- Evacuation routes and nearby relief shelters  
-- Historical risk trends and district selector  
+- Live geo-hazard mapping with risk / sensors / routes layers
+- Landslide risk scoring and AI prediction
+- Real-time IoT sensor status with live telemetry updates
+- Rainfall and soil moisture monitoring
+- High-risk zone identification
+- Emergency alerts and notification centre
+- Evacuation routes and nearby relief shelters
+- Siren and SMS broadcast controls with confirmation
+- Historical risk trends (7-day / 30-day)
+- District selector across Assam focus areas
 
-Open `index.html` to view the dashboard.
+## Deploy
+
+Static site. Connect this repository to Netlify — publish directory is the repo root (`index.html`).
+
+Locally: open `index.html` or serve the folder with any static file server.

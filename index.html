@@ -2,371 +2,262 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BHOOMI CHETNA — Landslide Early Warning System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#070b14" />
+  <meta name="description" content="BHOOMI CHETNA — AI-powered landslide early warning system for Assam (ASDMA)." />
+  <title>BHOOMI CHETNA — Landslide Early Warning</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="stage">
-    <header class="stage-brand">
-      <div class="stage-mark" aria-hidden="true"></div>
-      <div>
-        <p class="stage-kicker">ASDMA · Smart India Hackathon</p>
-        <h1>BHOOMI&nbsp;CHETNA</h1>
-        <p class="stage-sub">AI-Powered Landslide Early Warning · Assam</p>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none">
+            <path d="M20 4L34 12V28L20 36L6 28V12L20 4Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M20 12L28 16.5V25.5L20 30L12 25.5V16.5L20 12Z" fill="currentColor" opacity=".18"/>
+            <circle cx="20" cy="21" r="3.2" fill="#3ECF8E"/>
+          </svg>
+        </div>
+        <div>
+          <h1>BHOOMI CHETNA</h1>
+          <p class="live-line"><span class="pulse"></span> Live Monitoring · ASDMA</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <label class="district-select">
+          <span class="sr-only">District Focus</span>
+          <div class="select-shell">
+            <select id="district" aria-label="Select district">
+              <option value="guwahati">Guwahati Hills</option>
+              <option value="dima">Dima Hasao</option>
+              <option value="cachar">Cachar</option>
+              <option value="karbi">Karbi Anglong</option>
+            </select>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </label>
+        <button class="icon-btn" type="button" id="notifBtn" aria-label="Notifications" aria-expanded="false" aria-controls="notifPanel">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 4 2 5.5 2 5.5H4S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
+          <span class="badge" id="notifBadge">0</span>
+        </button>
       </div>
     </header>
 
-    <div class="device" role="presentation">
-      <div class="device-notch" aria-hidden="true"></div>
-      <div class="app" id="app">
-        <!-- Status / App Header -->
-        <header class="app-header">
-          <div class="status-row">
-            <span class="time" id="clock">16:42</span>
-            <div class="status-icons" aria-hidden="true">
-              <span class="sig"></span><span class="wifi"></span><span class="bat"></span>
-            </div>
+    <div class="notif-panel" id="notifPanel" hidden>
+      <div class="notif-head">
+        <strong>Emergency Alerts</strong>
+        <button type="button" id="markReadBtn">Mark all read</button>
+      </div>
+      <ul id="notifList"></ul>
+    </div>
+
+    <main class="views">
+      <!-- HOME -->
+      <section class="view active" id="view-home" data-view="home" aria-label="Dashboard home">
+        <div class="alert-strip" id="alertStrip" role="alert">
+          <div class="alert-icon" aria-hidden="true">!</div>
+          <div>
+            <strong id="alertTitle"></strong>
+            <p id="alertCopy"></p>
           </div>
-          <div class="brand-row">
-            <div class="brand">
-              <div class="logo" aria-hidden="true">
-                <svg viewBox="0 0 40 40" fill="none">
-                  <path d="M20 4L34 12V28L20 36L6 28V12L20 4Z" stroke="currentColor" stroke-width="1.6"/>
-                  <path d="M20 12L28 16.5V25.5L20 30L12 25.5V16.5L20 12Z" fill="currentColor" opacity=".18"/>
-                  <circle cx="20" cy="21" r="3.2" fill="#3ECF8E"/>
-                </svg>
-              </div>
-              <div>
-                <h2>BHOOMI CHETNA</h2>
-                <p class="live-line"><span class="pulse"></span> Live Monitoring · ASDMA</p>
-              </div>
-            </div>
-            <button class="icon-btn" type="button" aria-label="Notifications">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 4 2 5.5 2 5.5H4S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
-              <span class="badge">3</span>
-            </button>
-          </div>
+          <button class="alert-cta" type="button" id="viewAlert">Act</button>
+        </div>
 
-          <label class="district-select">
-            <span>District Focus</span>
-            <div class="select-shell">
-              <select id="district" aria-label="Select district">
-                <option value="guwahati">Guwahati Hills</option>
-                <option value="dima">Dima Hasao</option>
-                <option value="cachar">Cachar</option>
-                <option value="karbi">Karbi Anglong</option>
-              </select>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-          </label>
-        </header>
-
-        <main class="scroll">
-          <!-- Emergency Alert -->
-          <section class="alert-strip" id="alertStrip" role="alert">
-            <div class="alert-icon" aria-hidden="true">!</div>
-            <div>
-              <strong id="alertTitle">HIGH RISK ALERT — Guwahati Hills</strong>
-              <p id="alertCopy">AI forecasts slope failure within 6–12 hrs. Evacuate Zone R-2.</p>
-            </div>
-            <button class="alert-cta" type="button" id="viewAlert">Act</button>
-          </section>
-
-          <!-- Map -->
+        <div class="home-layout">
           <section class="map-panel" aria-label="Live geo-hazard map">
             <div class="map-chrome">
               <span class="map-title">Live Geo-Hazard Map</span>
-              <div class="map-toggles">
+              <div class="map-toggles" id="mapTogglesHome">
                 <button class="chip active" type="button" data-layer="risk">Risk</button>
                 <button class="chip" type="button" data-layer="sensors">Sensors</button>
                 <button class="chip" type="button" data-layer="routes">Routes</button>
               </div>
             </div>
-
-            <div class="map-canvas" id="mapCanvas">
-              <svg class="terrain" viewBox="0 0 360 280" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <defs>
-                  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#0E1A2B"/>
-                    <stop offset="100%" stop-color="#152538"/>
-                  </linearGradient>
-                  <linearGradient id="hillA" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#1E3A34"/>
-                    <stop offset="100%" stop-color="#12241F"/>
-                  </linearGradient>
-                  <linearGradient id="hillB" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#243B4A"/>
-                    <stop offset="100%" stop-color="#142230"/>
-                  </linearGradient>
-                  <radialGradient id="riskRed" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".72"/>
-                    <stop offset="100%" stop-color="#FF4D4D" stop-opacity="0"/>
-                  </radialGradient>
-                  <radialGradient id="riskAmber" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#F5C542" stop-opacity=".58"/>
-                    <stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
-                  </radialGradient>
-                  <radialGradient id="riskGreen" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#3ECF8E" stop-opacity=".48"/>
-                    <stop offset="100%" stop-color="#3ECF8E" stop-opacity="0"/>
-                  </radialGradient>
-                  <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                    <path d="M24 0H0V24" fill="none" stroke="rgba(120,160,200,.08)" stroke-width="1"/>
-                  </pattern>
-                </defs>
-                <rect width="360" height="280" fill="url(#sky)"/>
-                <rect width="360" height="280" fill="url(#grid)"/>
-                <path d="M0 190 C40 150 70 140 110 155 C150 170 170 130 210 125 C250 120 280 145 320 135 C340 130 355 140 360 145 V280 H0 Z" fill="url(#hillB)"/>
-                <path d="M0 220 C55 185 95 200 140 195 C190 190 220 160 270 170 C300 176 330 165 360 175 V280 H0 Z" fill="url(#hillA)"/>
-                <path class="river" d="M40 280 C70 240 90 220 130 200 C170 180 200 190 230 170 C260 150 290 140 340 110" fill="none" stroke="#3BA4C8" stroke-opacity=".35" stroke-width="3"/>
-
-                <!-- Risk zones -->
-                <g class="zones layer-risk">
-                  <ellipse class="zone zone-red" cx="168" cy="148" rx="56" ry="40" fill="url(#riskRed)"/>
-                  <ellipse class="zone zone-amber" cx="250" cy="168" rx="48" ry="34" fill="url(#riskAmber)"/>
-                  <ellipse class="zone zone-green" cx="95" cy="195" rx="42" ry="32" fill="url(#riskGreen)"/>
-                  <ellipse class="zone zone-amber" cx="300" cy="128" rx="34" ry="26" fill="url(#riskAmber)"/>
-                  <path class="zone-outline" d="M140 130 C155 118 185 118 198 138 C208 155 195 175 168 178 C145 180 130 155 140 130Z" fill="none" stroke="#FF4D4D" stroke-opacity=".55" stroke-width="1.5"/>
-                </g>
-
-                <!-- Evacuation routes -->
-                <g class="routes layer-routes" opacity="0">
-                  <path d="M168 148 C190 170 210 185 248 210" stroke="#7DD3FC" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/>
-                  <path d="M250 168 C235 190 210 205 175 230" stroke="#7DD3FC" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
-                  <circle cx="248" cy="210" r="5" fill="#7DD3FC"/>
-                  <circle cx="175" cy="230" r="5" fill="#7DD3FC"/>
-                </g>
-
-                <!-- Sensor pins -->
-                <g class="sensors layer-sensors">
-                  <g class="pin online" transform="translate(160,140)"><circle r="7" fill="#0B1220"/><circle r="4" fill="#3ECF8E"/><circle class="ring" r="10" fill="none" stroke="#3ECF8E" stroke-opacity=".5"/></g>
-                  <g class="pin online" transform="translate(242,160)"><circle r="7" fill="#0B1220"/><circle r="4" fill="#3ECF8E"/><circle class="ring" r="10" fill="none" stroke="#3ECF8E" stroke-opacity=".5"/></g>
-                  <g class="pin warn" transform="translate(292,122)"><circle r="7" fill="#0B1220"/><circle r="4" fill="#F5C542"/><circle class="ring" r="10" fill="none" stroke="#F5C542" stroke-opacity=".5"/></g>
-                  <g class="pin offline" transform="translate(108,188)"><circle r="7" fill="#0B1220"/><circle r="4" fill="#EF4444"/></g>
-                  <g class="pin online" transform="translate(205,195)"><circle r="7" fill="#0B1220"/><circle r="4" fill="#3ECF8E"/><circle class="ring" r="10" fill="none" stroke="#3ECF8E" stroke-opacity=".5"/></g>
-                </g>
-
-                <!-- Shelter markers -->
-                <g class="shelters layer-routes" opacity="0">
-                  <g transform="translate(248,210)">
-                    <rect x="-10" y="-8" width="20" height="16" rx="3" fill="#0B1220" stroke="#7DD3FC"/>
-                    <path d="M-6 2 V-2 H6 V2" stroke="#7DD3FC" stroke-width="1.5" fill="none"/>
-                  </g>
-                  <g transform="translate(175,230)">
-                    <rect x="-10" y="-8" width="20" height="16" rx="3" fill="#0B1220" stroke="#7DD3FC"/>
-                    <path d="M-6 2 V-2 H6 V2" stroke="#7DD3FC" stroke-width="1.5" fill="none"/>
-                  </g>
-                </g>
-
-                <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.08em">ASSAM · NORTHEAST INDIA</text>
-                <text id="mapDistrictLabel" x="20" y="52" fill="#E8EEF7" font-size="14" font-family="Sora, sans-serif" font-weight="600">Guwahati Hills</text>
-              </svg>
-
-              <div class="map-legend">
-                <span><i class="dot red"></i>High</span>
-                <span><i class="dot amber"></i>Watch</span>
-                <span><i class="dot green"></i>Stable</span>
-              </div>
-
-              <div class="map-float risk-pill" id="riskPill">
-                <span class="label">Zone R-2</span>
-                <strong>HIGH</strong>
-              </div>
-            </div>
+            <div class="map-canvas" id="mapCanvasHome"></div>
           </section>
 
-          <!-- Risk Score + AI -->
-          <section class="grid-2">
-            <article class="card risk-card" id="riskCard">
+          <div class="home-side">
+            <article class="card risk-card">
               <p class="card-label">Landslide Risk Score</p>
               <div class="score-row">
-                <div class="score-ring" id="scoreRing" style="--p:78">
-                  <strong id="scoreValue">78</strong>
-                </div>
+                <div class="score-ring" id="scoreRing" style="--p:0"><strong id="scoreValue">—</strong></div>
                 <div>
-                  <p class="level high" id="riskLevel">HIGH RISK</p>
-                  <p class="meta" id="riskMeta">Confidence 91% · Updated 42s ago</p>
+                  <p class="level" id="riskLevel"></p>
+                  <p class="meta" id="riskMeta"></p>
                 </div>
               </div>
             </article>
 
             <article class="card ai-card">
               <p class="card-label">AI Prediction</p>
-              <p class="ai-headline" id="aiHeadline">Slope instability rising</p>
-              <p class="meta" id="aiMeta">Failure window: 6–12 hours</p>
-              <div class="ai-bar"><span style="width:78%"></span></div>
+              <p class="ai-headline" id="aiHeadline"></p>
+              <p class="meta" id="aiMeta"></p>
+              <div class="ai-bar"><span id="aiBarFill"></span></div>
             </article>
-          </section>
 
-          <!-- IoT Sensors -->
-          <section class="card">
-            <div class="card-head">
-              <p class="card-label">IoT Sensor Network</p>
-              <span class="live-tag"><span class="pulse"></span> Real-time</span>
+            <div class="grid-2">
+              <article class="card">
+                <p class="card-label">Rainfall</p>
+                <p class="metric"><span id="rainValue">—</span><small>mm / 24h</small></p>
+                <div class="mini-chart" id="rainChart" aria-hidden="true"></div>
+                <p class="meta" id="rainMeta"></p>
+              </article>
+              <article class="card">
+                <p class="card-label">Soil Moisture</p>
+                <p class="metric"><span id="soilValue">—</span><small>%</small></p>
+                <div class="gauge">
+                  <div class="gauge-track"><div class="gauge-fill" id="soilFill"></div></div>
+                  <div class="gauge-marks"><span>0</span><span>50</span><span>100</span></div>
+                </div>
+                <p class="meta" id="soilMeta"></p>
+              </article>
             </div>
-            <div class="sensor-grid" id="sensorGrid">
-              <div class="sensor online">
-                <div class="sensor-top"><span>GH-S01</span><i></i></div>
-                <strong>Incline</strong>
-                <p>Online · 2.4°</p>
-              </div>
-              <div class="sensor online">
-                <div class="sensor-top"><span>GH-S02</span><i></i></div>
-                <strong>Pore Pressure</strong>
-                <p>Online · 48 kPa</p>
-              </div>
-              <div class="sensor warn">
-                <div class="sensor-top"><span>GH-S03</span><i></i></div>
-                <strong>Vibration</strong>
-                <p>Degraded · High</p>
-              </div>
-              <div class="sensor offline">
-                <div class="sensor-top"><span>GH-S04</span><i></i></div>
-                <strong>Extensometer</strong>
-                <p>Offline · 14m</p>
-              </div>
-            </div>
-          </section>
 
-          <!-- Rainfall & Soil -->
-          <section class="grid-2">
             <article class="card">
-              <p class="card-label">Rainfall</p>
-              <p class="metric"><span id="rainValue">86</span><small>mm / 24h</small></p>
-              <div class="mini-chart" aria-hidden="true">
-                <span style="--h:28%"></span><span style="--h:42%"></span><span style="--h:55%"></span>
-                <span style="--h:48%"></span><span style="--h:70%"></span><span style="--h:88%"></span>
-                <span style="--h:76%"></span>
+              <div class="card-head">
+                <p class="card-label">High-Risk Zones</p>
+                <span class="count-pill" id="zoneCount"></span>
               </div>
-              <p class="meta warn-text">Above threshold (65 mm)</p>
+              <ul class="zone-list" id="zoneList"></ul>
             </article>
+
             <article class="card">
-              <p class="card-label">Soil Moisture</p>
-              <p class="metric"><span id="soilValue">74</span><small>%</small></p>
-              <div class="gauge">
-                <div class="gauge-track"><div class="gauge-fill" id="soilFill" style="width:74%"></div></div>
-                <div class="gauge-marks"><span>0</span><span>50</span><span>100</span></div>
+              <div class="card-head">
+                <p class="card-label">Historical Risk Trends</p>
+                <div class="segment" role="tablist">
+                  <button class="seg active" type="button" data-range="7d">7D</button>
+                  <button class="seg" type="button" data-range="30d">30D</button>
+                </div>
               </div>
-              <p class="meta warn-text">Saturation critical</p>
+              <div class="trend-chart" id="trendChart" aria-hidden="true">
+                <svg viewBox="0 0 320 110" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#EF4444" stop-opacity=".35"/>
+                      <stop offset="100%" stop-color="#EF4444" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="28" x2="320" y2="28" stroke="rgba(255,255,255,.06)"/>
+                  <line x1="0" y1="55" x2="320" y2="55" stroke="rgba(255,255,255,.06)"/>
+                  <line x1="0" y1="82" x2="320" y2="82" stroke="rgba(255,255,255,.06)"/>
+                  <path id="trendArea" fill="url(#trendFill)" d=""/>
+                  <path id="trendLine" fill="none" stroke="#EF4444" stroke-width="2.5" d=""/>
+                </svg>
+                <div class="trend-labels" id="trendLabels"></div>
+              </div>
+              <p class="meta" id="trendMeta"></p>
             </article>
-          </section>
+          </div>
+        </div>
+      </section>
 
-          <!-- High-risk zones -->
-          <section class="card">
-            <div class="card-head">
-              <p class="card-label">High-Risk Zones</p>
-              <span class="count-pill" id="zoneCount">3 active</span>
+      <!-- MAP -->
+      <section class="view" id="view-map" data-view="map" aria-label="Full map" hidden>
+        <div class="map-panel map-panel-full">
+          <div class="map-chrome">
+            <span class="map-title">District Hazard Map</span>
+            <div class="map-toggles" id="mapTogglesFull">
+              <button class="chip active" type="button" data-layer="risk">Risk</button>
+              <button class="chip" type="button" data-layer="sensors">Sensors</button>
+              <button class="chip" type="button" data-layer="routes">Routes</button>
             </div>
-            <ul class="zone-list" id="zoneList">
-              <li>
-                <span class="z-dot red"></span>
-                <div><strong>R-2 Chandmari Slope</strong><p>Score 86 · Evacuate</p></div>
-                <em>0.8 km</em>
-              </li>
-              <li>
-                <span class="z-dot amber"></span>
-                <div><strong>R-5 Kharghuli Ridge</strong><p>Score 64 · Watch</p></div>
-                <em>2.1 km</em>
-              </li>
-              <li>
-                <span class="z-dot amber"></span>
-                <div><strong>R-7 Fatasil Cut</strong><p>Score 58 · Monitor</p></div>
-                <em>3.4 km</em>
-              </li>
-            </ul>
-          </section>
+          </div>
+          <div class="map-canvas map-canvas-lg" id="mapCanvasFull"></div>
+          <div class="map-detail card" id="mapDetail"></div>
+        </div>
+      </section>
 
-          <!-- Evacuation & Shelters -->
-          <section class="card">
-            <p class="card-label">Evacuation & Relief</p>
-            <div class="route-card">
-              <div>
-                <strong>Primary Route</strong>
-                <p>Chandmari → Zoo Road → Shelter A</p>
-              </div>
-              <span class="eta">14 min</span>
-            </div>
-            <div class="shelter-row">
-              <div class="shelter">
-                <strong>Relief Shelter A</strong>
-                <p>Dispur Community Hall</p>
-                <span>Cap. 420 · 2.4 km</span>
-              </div>
-              <div class="shelter">
-                <strong>Relief Shelter B</strong>
-                <p>Latasil Ground Camp</p>
-                <span>Cap. 280 · 3.1 km</span>
-              </div>
-            </div>
-          </section>
+      <!-- SENSORS -->
+      <section class="view" id="view-sensors" data-view="sensors" aria-label="Sensor network" hidden>
+        <div class="card">
+          <div class="card-head">
+            <p class="card-label">IoT Sensor Network</p>
+            <span class="live-tag"><span class="pulse"></span> Real-time</span>
+          </div>
+          <div class="sensor-summary" id="sensorSummary"></div>
+          <div class="sensor-grid sensor-grid-lg" id="sensorGrid"></div>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <p class="card-label">Network Health</p>
+            <div class="health-bars" id="healthBars"></div>
+          </article>
+          <article class="card">
+            <p class="card-label">Latest Telemetry</p>
+            <ul class="telemetry-list" id="telemetryList"></ul>
+          </article>
+        </div>
+      </section>
 
-          <!-- Siren / SMS Controls -->
-          <section class="card controls-card">
-            <p class="card-label">Emergency Broadcast</p>
-            <div class="controls">
-              <button class="control-btn siren" type="button" id="sirenBtn">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10v4h3l5 4V6L7 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>
-                <span>Activate Siren</span>
-              </button>
-              <button class="control-btn sms" type="button" id="smsBtn">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3V5Z"/></svg>
-                <span>Send SMS Alert</span>
-              </button>
-            </div>
-            <p class="control-note" id="controlNote">Authorized for ASDMA & district controllers</p>
-          </section>
+      <!-- RELIEF -->
+      <section class="view" id="view-relief" data-view="relief" aria-label="Evacuation and relief" hidden>
+        <article class="card">
+          <p class="card-label">Evacuation Route</p>
+          <div class="route-card" id="routeCard"></div>
+          <ol class="route-steps" id="routeSteps"></ol>
+        </article>
 
-          <!-- Historical Trends -->
-          <section class="card">
-            <div class="card-head">
-              <p class="card-label">Historical Risk Trends</p>
-              <div class="segment" role="tablist">
-                <button class="seg active" type="button" data-range="7d">7D</button>
-                <button class="seg" type="button" data-range="30d">30D</button>
-              </div>
-            </div>
-            <div class="trend-chart" id="trendChart" aria-hidden="true">
-              <svg viewBox="0 0 320 110" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#EF4444" stop-opacity=".35"/>
-                    <stop offset="100%" stop-color="#EF4444" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                <line x1="0" y1="28" x2="320" y2="28" stroke="rgba(255,255,255,.06)"/>
-                <line x1="0" y1="55" x2="320" y2="55" stroke="rgba(255,255,255,.06)"/>
-                <line x1="0" y1="82" x2="320" y2="82" stroke="rgba(255,255,255,.06)"/>
-                <path id="trendArea" fill="url(#trendFill)" d=""/>
-                <path id="trendLine" fill="none" stroke="#EF4444" stroke-width="2.5" d=""/>
-              </svg>
-              <div class="trend-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Today</span></div>
-            </div>
-            <p class="meta" id="trendMeta">Risk climbed +22 pts after prolonged monsoon rainfall.</p>
-          </section>
+        <article class="card">
+          <div class="card-head">
+            <p class="card-label">Nearby Relief Shelters</p>
+            <span class="count-pill soft" id="shelterCount"></span>
+          </div>
+          <div class="shelter-list" id="shelterList"></div>
+        </article>
 
-          <footer class="app-footer">
-            <p>Assam State Disaster Management Authority</p>
-            <p>For emergency teams & local communities</p>
-          </footer>
-        </main>
+        <article class="card controls-card">
+          <p class="card-label">Emergency Broadcast</p>
+          <div class="controls">
+            <button class="control-btn siren" type="button" id="sirenBtn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10v4h3l5 4V6L7 10H4Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>
+              <span>Activate Siren</span>
+            </button>
+            <button class="control-btn sms" type="button" id="smsBtn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3V5Z"/></svg>
+              <span>Send SMS Alert</span>
+            </button>
+          </div>
+          <p class="control-note" id="controlNote">Authorized for ASDMA &amp; district controllers</p>
+          <ul class="broadcast-log" id="broadcastLog"></ul>
+        </article>
+      </section>
+    </main>
 
-        <!-- Bottom Nav -->
-        <nav class="tabbar" aria-label="Primary">
-          <button class="tab active" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10.5 12 4l8 6.5V20H4v-9.5Z"/><path d="M9 20v-6h6v6"/></svg><span>Home</span></button>
-          <button class="tab" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg><span>Map</span></button>
-          <button class="tab" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/><circle cx="12" cy="12" r="3"/></svg><span>Sensors</span></button>
-          <button class="tab" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V6.5L12 4l7 2.5V19"/><path d="M9 19v-6h6v6"/></svg><span>Relief</span></button>
-        </nav>
+    <nav class="tabbar" aria-label="Primary">
+      <button class="tab active" type="button" data-nav="home">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10.5 12 4l8 6.5V20H4v-9.5Z"/><path d="M9 20v-6h6v6"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="tab" type="button" data-nav="map">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>
+        <span>Map</span>
+      </button>
+      <button class="tab" type="button" data-nav="sensors">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Sensors</span>
+      </button>
+      <button class="tab" type="button" data-nav="relief">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V6.5L12 4l7 2.5V19"/><path d="M9 19v-6h6v6"/></svg>
+        <span>Relief</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="modal" id="confirmModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <p id="modalBody"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="modalCancel">Cancel</button>
+        <button type="button" class="btn danger" id="modalConfirm">Confirm</button>
       </div>
     </div>
-
-    <aside class="stage-notes" aria-label="Product highlights">
-      <p>Live geo-hazard mapping · Risk scoring · IoT status · Rainfall & soil moisture · AI prediction · High-risk zones · Emergency alerts · Evacuation routes · Relief shelters · Siren / SMS · Historical trends · District selector</p>
-    </aside>
   </div>
 
   <div class="toast" id="toast" hidden></div>
