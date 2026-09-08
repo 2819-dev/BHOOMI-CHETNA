@@ -3,8 +3,8 @@ const DISTRICT_DATA = {
     name: "Guwahati Hills",
     score: 78,
     confidence: 91,
-    aiHeadline: "Slope instability rising on Chandmari corridor",
-    aiMeta: "Estimated failure window: 6 to 12 hours",
+    predHeadline: "Slope instability rising on Chandmari corridor",
+    predMeta: "Estimated failure window: 6 to 12 hours",
     rain: 86,
     rainSeries: [28, 42, 55, 48, 70, 88, 76],
     soil: 74,
@@ -39,8 +39,8 @@ const DISTRICT_DATA = {
     name: "Dima Hasao",
     score: 61,
     confidence: 87,
-    aiHeadline: "Soil saturation elevating cut-slope risk",
-    aiMeta: "Escalate if 24h rainfall exceeds 40 mm",
+    predHeadline: "Soil saturation elevating cut-slope risk",
+    predMeta: "Escalate if 24h rainfall exceeds 40 mm",
     rain: 58,
     rainSeries: [22, 30, 36, 41, 49, 55, 58],
     soil: 66,
@@ -73,8 +73,8 @@ const DISTRICT_DATA = {
     name: "Cachar",
     score: 34,
     confidence: 94,
-    aiHeadline: "No critical displacement detected",
-    aiMeta: "Next model cycle in 15 minutes",
+    predHeadline: "No critical displacement detected",
+    predMeta: "Next model cycle in 15 minutes",
     rain: 28,
     rainSeries: [18, 22, 20, 25, 24, 30, 28],
     soil: 41,
@@ -107,8 +107,8 @@ const DISTRICT_DATA = {
     name: "Karbi Anglong",
     score: 82,
     confidence: 89,
-    aiHeadline: "Cascading failure risk on Diphu scarp",
-    aiMeta: "Estimated failure window: 4 to 10 hours",
+    predHeadline: "Cascading failure risk on Diphu scarp",
+    predMeta: "Estimated failure window: 4 to 10 hours",
     rain: 94,
     rainSeries: [40, 52, 61, 70, 78, 90, 94],
     soil: 81,
@@ -139,6 +139,39 @@ const DISTRICT_DATA = {
   },
 };
 
+const ADMIN_KEY = "bhoomi-chetna-admin-v1";
+
+const DEFAULT_ADMIN = {
+  highScore: 70,
+  watchScore: 50,
+  rainThreshold: 65,
+  soilThreshold: 70,
+  autoSms: false,
+  sirenArmed: true,
+  operatorId: "op-1",
+  officers: [
+    { id: "op-1", name: "R. Sharma", role: "ASDMA Controller" },
+    { id: "op-2", name: "M. Das", role: "District Officer · Kamrup Metro" },
+    { id: "op-3", name: "P. Teron", role: "Field Lead · Karbi Anglong" },
+  ],
+  maintenance: {},
+  archive: [],
+};
+
+function loadAdmin() {
+  try {
+    const raw = localStorage.getItem(ADMIN_KEY);
+    if (!raw) return structuredClone(DEFAULT_ADMIN);
+    return { ...structuredClone(DEFAULT_ADMIN), ...JSON.parse(raw) };
+  } catch {
+    return structuredClone(DEFAULT_ADMIN);
+  }
+}
+
+function saveAdmin() {
+  localStorage.setItem(ADMIN_KEY, JSON.stringify(state.admin));
+}
+
 const state = {
   district: "guwahati",
   view: "home",
@@ -149,29 +182,42 @@ const state = {
   notifications: [],
   broadcastLog: [],
   live: null,
+  admin: loadAdmin(),
+  lastRiskClass: null,
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 function levelFromScore(score) {
-  if (score >= 70) return { level: "HIGH RISK", cls: "high", pill: "HIGH" };
-  if (score >= 50) return { level: "WATCH", cls: "watch", pill: "WATCH" };
+  const high = state.admin.highScore;
+  const watch = state.admin.watchScore;
+  if (score >= high) return { level: "HIGH RISK", cls: "high", pill: "HIGH" };
+  if (score >= watch) return { level: "WATCH", cls: "watch", pill: "WATCH" };
   return { level: "STABLE", cls: "safe", pill: "STABLE" };
 }
 
 function riskColor(score) {
-  if (score >= 70) return "#d64545";
-  if (score >= 50) return "#c9962a";
+  const lvl = levelFromScore(score);
+  if (lvl.cls === "high") return "#d64545";
+  if (lvl.cls === "watch") return "#c9962a";
   return "#2f9e6b";
 }
 
 function cloneLive(key) {
   const base = DISTRICT_DATA[key];
-  return {
+  const live = {
     ...structuredClone(base),
     key,
+    rainThreshold: state.admin.rainThreshold,
   };
+  live.sensors = live.sensors.map((s) => {
+    if (state.admin.maintenance[s.id]) {
+      return { ...s, status: "offline", value: null, maintenance: true };
+    }
+    return { ...s, maintenance: false };
+  });
+  return live;
 }
 
 function formatUpdated(ms) {
@@ -387,11 +433,11 @@ function renderHome() {
   $("#riskLevel").className = `level ${lvl.cls}`;
   $("#riskMeta").textContent = `Confidence ${d.confidence}% · ${formatUpdated(state.updatedAt)}`;
 
-  $("#aiHeadline").textContent = d.aiHeadline;
-  $("#aiMeta").textContent = d.aiMeta;
-  const aiFill = $("#aiBarFill");
-  aiFill.style.width = `${d.score}%`;
-  aiFill.className = lvl.cls === "high" ? "" : lvl.cls;
+  $("#predHeadline").textContent = d.predHeadline;
+  $("#predMeta").textContent = d.predMeta;
+  const predFill = $("#predBarFill");
+  predFill.style.width = `${d.score}%`;
+  predFill.className = lvl.cls === "high" ? "" : lvl.cls;
 
   $("#rainValue").textContent = Math.round(d.rain);
   $("#rainChart").innerHTML = d.rainSeries
@@ -409,10 +455,11 @@ function renderHome() {
   $("#soilValue").textContent = Math.round(d.soil);
   $("#soilFill").style.width = `${d.soil}%`;
   const soilMeta = $("#soilMeta");
-  if (d.soil >= 70) {
-    soilMeta.textContent = "Saturation critical";
+  const soilThr = state.admin.soilThreshold;
+  if (d.soil >= soilThr) {
+    soilMeta.textContent = `Above soil threshold (${soilThr}%)`;
     soilMeta.className = "meta warn-text";
-  } else if (d.soil >= 55) {
+  } else if (d.soil >= soilThr - 15) {
     soilMeta.textContent = "Moisture elevated";
     soilMeta.className = "meta warn-text";
   } else {
@@ -596,12 +643,92 @@ function renderNotifications() {
   });
 }
 
+function renderAdmin() {
+  const a = state.admin;
+  $("#thrHigh").value = a.highScore;
+  $("#thrWatch").value = a.watchScore;
+  $("#thrRain").value = a.rainThreshold;
+  $("#thrSoil").value = a.soilThreshold;
+  $("#thresholdNote").textContent = `Active bands: High ≥ ${a.highScore}, Watch ≥ ${a.watchScore}. Rain alert ${a.rainThreshold} mm. Soil alert ${a.soilThreshold}%.`;
+
+  $("#operatorSelect").innerHTML = a.officers
+    .map((o) => `<option value="${o.id}" ${o.id === a.operatorId ? "selected" : ""}>${o.name} · ${o.role}</option>`)
+    .join("");
+
+  $("#officerCount").textContent = `${a.officers.length} on roster`;
+  $("#officerList").innerHTML = a.officers
+    .map(
+      (o) => `<li>
+      <div><strong>${o.name}</strong><p>${o.role}</p></div>
+      <button type="button" data-remove-officer="${o.id}" ${a.officers.length <= 1 ? "disabled" : ""}>Remove</button>
+    </li>`
+    )
+    .join("");
+
+  $$("[data-remove-officer]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.removeOfficer;
+      if (state.admin.officers.length <= 1) return;
+      state.admin.officers = state.admin.officers.filter((o) => o.id !== id);
+      if (state.admin.operatorId === id) state.admin.operatorId = state.admin.officers[0].id;
+      saveAdmin();
+      renderAdmin();
+      toast("Officer removed from roster");
+    });
+  });
+
+  const sensors = state.live.sensors;
+  $("#adminSensorList").innerHTML = sensors
+    .map((s) => {
+      const inMaint = !!state.admin.maintenance[s.id];
+      return `<div class="admin-sensor-row">
+        <div>
+          <strong>${s.id} · ${s.name}</strong>
+          <p>${inMaint ? "Maintenance · offline" : s.status === "offline" ? "Fault · offline" : `Live · ${s.value}${s.unit}`}</p>
+        </div>
+        <button type="button" class="toggle ${inMaint ? "on" : ""}" data-maint="${s.id}" aria-pressed="${inMaint}">${inMaint ? "Maint." : "Active"}</button>
+      </div>`;
+    })
+    .join("");
+
+  $$("[data-maint]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.maint;
+      if (state.admin.maintenance[id]) delete state.admin.maintenance[id];
+      else state.admin.maintenance[id] = true;
+      saveAdmin();
+      state.live = cloneLive(state.district);
+      renderAll();
+      toast(state.admin.maintenance[id] ? `${id} set to maintenance` : `${id} returned to service`);
+    });
+  });
+
+  const auto = $("#autoSmsToggle");
+  auto.classList.toggle("on", a.autoSms);
+  auto.setAttribute("aria-pressed", String(a.autoSms));
+  auto.textContent = a.autoSms ? "On" : "Off";
+
+  const arm = $("#sirenArmToggle");
+  arm.classList.toggle("on", a.sirenArmed);
+  arm.setAttribute("aria-pressed", String(a.sirenArmed));
+  arm.textContent = a.sirenArmed ? "On" : "Off";
+
+  const archive = [...a.archive, ...state.broadcastLog];
+  $("#adminBroadcastLog").innerHTML = archive.length
+    ? archive
+        .slice(0, 12)
+        .map((e) => `<li>${e.time} · ${e.message}</li>`)
+        .join("")
+    : `<li>No broadcast records yet.</li>`;
+}
+
 function renderAll() {
   renderMaps();
   renderHome();
   renderSensors();
   renderRelief();
   renderNotifications();
+  renderAdmin();
   syncLayerChips();
 }
 
@@ -609,6 +736,7 @@ function setDistrict(key) {
   state.district = key;
   state.live = cloneLive(key);
   state.updatedAt = Date.now();
+  state.lastRiskClass = levelFromScore(state.live.score).cls;
   renderAll();
 }
 
@@ -624,6 +752,7 @@ function navigate(view) {
     applyLayer($("#mapCanvasHome"), state.layer);
     applyLayer($("#mapCanvasFull"), state.layer);
   }
+  if (view === "admin") renderAdmin();
   window.location.hash = view;
 }
 
@@ -652,10 +781,20 @@ function confirmAction({ title, body, confirmLabel = "Confirm" }) {
   });
 }
 
+function currentOperator() {
+  return state.admin.officers.find((o) => o.id === state.admin.operatorId) || state.admin.officers[0];
+}
+
 function logBroadcast(message) {
   const time = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false });
-  state.broadcastLog.unshift({ time, message });
+  const op = currentOperator();
+  const entry = { time, message: `${message} · by ${op.name}` };
+  state.broadcastLog.unshift(entry);
+  state.admin.archive.unshift(entry);
+  state.admin.archive = state.admin.archive.slice(0, 40);
+  saveAdmin();
   renderRelief();
+  if (state.view === "admin") renderAdmin();
 }
 
 function tickLive() {
@@ -665,8 +804,10 @@ function tickLive() {
   d.rain = Math.max(0, +(d.rain + (Math.random() * 0.6 - 0.2)).toFixed(1));
   d.soil = Math.min(100, Math.max(0, +(d.soil + (Math.random() * 0.5 - 0.2)).toFixed(1)));
   d.score = Math.min(99, Math.max(5, +(d.score + (Math.random() * 0.7 - 0.3)).toFixed(1)));
+  d.rainThreshold = state.admin.rainThreshold;
   d.rainSeries = d.rainSeries.map((v, i) => (i === d.rainSeries.length - 1 ? Math.round(d.rain) : v));
   d.sensors = d.sensors.map((s) => {
+    if (state.admin.maintenance[s.id]) return { ...s, status: "offline", value: null, maintenance: true };
     if (s.status === "offline" || s.value == null) return s;
     const delta = (Math.random() - 0.48) * (s.unit === "°" ? 0.04 : s.unit === "%" ? 0.3 : 0.25);
     return { ...s, value: Math.round((s.value + delta) * 10) / 10 };
@@ -674,20 +815,27 @@ function tickLive() {
 
   const lvl = levelFromScore(d.score);
   if (lvl.cls === "high") {
-    d.aiHeadline = `Slope instability rising on ${d.zones[0].title.split(" ").slice(1).join(" ") || d.name}`;
-    d.aiMeta = "Estimated failure window: 4 to 12 hours";
+    d.predHeadline = `Slope instability rising on ${d.zones[0].title.split(" ").slice(1).join(" ") || d.name}`;
+    d.predMeta = "Estimated failure window: 4 to 12 hours";
   } else if (lvl.cls === "watch") {
-    d.aiHeadline = "Soil saturation elevating cut-slope risk";
-    d.aiMeta = `Escalate if 24h rainfall exceeds ${d.rainThreshold} mm`;
+    d.predHeadline = "Soil saturation elevating cut-slope risk";
+    d.predMeta = `Escalate if 24h rainfall exceeds ${d.rainThreshold} mm`;
   } else {
-    d.aiHeadline = "No critical displacement detected";
-    d.aiMeta = "Next model cycle in 15 minutes";
+    d.predHeadline = "No critical displacement detected";
+    d.predMeta = "Next model cycle in 15 minutes";
   }
+
+  if (state.lastRiskClass !== "high" && lvl.cls === "high" && state.admin.autoSms) {
+    logBroadcast(`Auto SMS queued for ${d.name} high-risk crossing`);
+    toast(`Auto SMS queued for ${d.name}`);
+  }
+  state.lastRiskClass = lvl.cls;
 
   state.updatedAt = Date.now();
   renderHome();
   renderSensors();
   if (state.view === "map") renderMaps();
+  if (state.view === "admin") renderAdmin();
 }
 
 function setupEvents() {
@@ -702,12 +850,9 @@ function setupEvents() {
       applyLayer($("#mapCanvasHome"), state.layer);
       applyLayer($("#mapCanvasFull"), state.layer);
       const detail = $("#mapDetail");
-      if (detail && !detail.querySelector("h3")) renderMaps();
-      else {
-        const top = [...state.live.zones].sort((a, b) => b.score - a.score)[0];
-        detail.innerHTML = `<h3>${top.title}</h3>
-          <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Layer view: <strong>${state.layer}</strong>.</p>`;
-      }
+      const top = [...state.live.zones].sort((a, b) => b.score - a.score)[0];
+      detail.innerHTML = `<h3>${top.title}</h3>
+        <p>Risk score ${top.score} · ${top.action}. Distance ${top.dist}. Layer view: <strong>${state.layer}</strong>.</p>`;
       toast(`${state.layer[0].toUpperCase()}${state.layer.slice(1)} layer shown`);
     });
   });
@@ -752,6 +897,10 @@ function setupEvents() {
   });
 
   $("#sirenBtn").addEventListener("click", async () => {
+    if (!state.admin.sirenArmed && !state.sirenOn) {
+      toast("Siren arming is disabled in Admin");
+      return;
+    }
     if (state.sirenOn) {
       state.sirenOn = false;
       logBroadcast(`Sirens stopped in ${state.live.name}`);
@@ -783,19 +932,106 @@ function setupEvents() {
     toast("SMS alert queued");
   });
 
+  $("#thresholdForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const high = Number($("#thrHigh").value);
+    const watch = Number($("#thrWatch").value);
+    const rain = Number($("#thrRain").value);
+    const soil = Number($("#thrSoil").value);
+    if (watch >= high) {
+      toast("Watch threshold must be lower than high risk");
+      return;
+    }
+    state.admin.highScore = high;
+    state.admin.watchScore = watch;
+    state.admin.rainThreshold = rain;
+    state.admin.soilThreshold = soil;
+    saveAdmin();
+    state.live.rainThreshold = rain;
+    renderAll();
+    toast("Thresholds saved");
+  });
+
+  $("#officerForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("#officerName").value.trim();
+    const role = $("#officerRole").value.trim();
+    if (!name || !role) return;
+    state.admin.officers.push({ id: `op-${Date.now()}`, name, role });
+    $("#officerForm").reset();
+    saveAdmin();
+    renderAdmin();
+    toast("Officer added");
+  });
+
+  $("#operatorSelect").addEventListener("change", (e) => {
+    state.admin.operatorId = e.target.value;
+    saveAdmin();
+    toast(`Signed in as ${currentOperator().name}`);
+  });
+
+  $("#autoSmsToggle").addEventListener("click", () => {
+    state.admin.autoSms = !state.admin.autoSms;
+    saveAdmin();
+    renderAdmin();
+    toast(state.admin.autoSms ? "Auto SMS enabled" : "Auto SMS disabled");
+  });
+
+  $("#sirenArmToggle").addEventListener("click", () => {
+    state.admin.sirenArmed = !state.admin.sirenArmed;
+    if (!state.admin.sirenArmed && state.sirenOn) {
+      state.sirenOn = false;
+      logBroadcast(`Sirens force-stopped · arming disabled`);
+    }
+    saveAdmin();
+    renderAdmin();
+    renderRelief();
+    toast(state.admin.sirenArmed ? "Siren arming enabled" : "Siren arming disabled");
+  });
+
+  $("#resetAdminBtn").addEventListener("click", async () => {
+    const ok = await confirmAction({
+      title: "Reset admin settings?",
+      body: "This restores default thresholds, clears maintenance flags, and keeps the default officer roster.",
+      confirmLabel: "Reset",
+    });
+    if (!ok) return;
+    state.admin = structuredClone(DEFAULT_ADMIN);
+    saveAdmin();
+    state.live = cloneLive(state.district);
+    renderAll();
+    toast("Admin settings reset");
+  });
+
+  $("#clearArchiveBtn").addEventListener("click", async () => {
+    const ok = await confirmAction({
+      title: "Clear broadcast archive?",
+      body: "This removes saved broadcast records from this browser.",
+      confirmLabel: "Clear",
+    });
+    if (!ok) return;
+    state.admin.archive = [];
+    state.broadcastLog = [];
+    saveAdmin();
+    renderRelief();
+    renderAdmin();
+    toast("Broadcast archive cleared");
+  });
+
   window.addEventListener("hashchange", () => {
     const view = location.hash.replace("#", "");
-    if (["home", "map", "sensors", "relief"].includes(view)) navigate(view);
+    if (["home", "map", "sensors", "relief", "admin"].includes(view)) navigate(view);
   });
 }
 
 function init() {
   buildNotifications();
   state.live = cloneLive(state.district);
+  state.lastRiskClass = levelFromScore(state.live.score).cls;
   setupEvents();
   renderAll();
   const initial = location.hash.replace("#", "");
-  navigate(["home", "map", "sensors", "relief"].includes(initial) ? initial : "home");
+  navigate(["home", "map", "sensors", "relief", "admin"].includes(initial) ? initial : "home");
   setInterval(tickLive, 7000);
   setInterval(() => {
     if (state.view === "home") $("#riskMeta").textContent = `Confidence ${state.live.confidence}% · ${formatUpdated(state.updatedAt)}`;

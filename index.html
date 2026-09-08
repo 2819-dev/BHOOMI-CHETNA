@@ -94,11 +94,11 @@
               </div>
             </article>
 
-            <article class="card ai-card">
+            <article class="card pred-card">
               <p class="card-label">Model Prediction</p>
-              <p class="ai-headline" id="aiHeadline">Slope instability rising</p>
-              <p class="meta" id="aiMeta">Estimated failure window: 6 to 12 hours</p>
-              <div class="ai-bar"><span id="aiBarFill" style="width:78%"></span></div>
+              <p class="pred-headline" id="predHeadline">Slope instability rising</p>
+              <p class="meta" id="predMeta">Estimated failure window: 6 to 12 hours</p>
+              <div class="pred-bar"><span id="predBarFill" style="width:78%"></span></div>
             </article>
 
             <div class="grid-2">
@@ -139,15 +139,15 @@
                 <svg viewBox="0 0 320 110" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#EF4444" stop-opacity=".35"/>
-                      <stop offset="100%" stop-color="#EF4444" stop-opacity="0"/>
+                      <stop offset="0%" stop-color="#D64545" stop-opacity=".35"/>
+                      <stop offset="100%" stop-color="#D64545" stop-opacity="0"/>
                     </linearGradient>
                   </defs>
                   <line x1="0" y1="28" x2="320" y2="28" stroke="rgba(255,255,255,.06)"/>
                   <line x1="0" y1="55" x2="320" y2="55" stroke="rgba(255,255,255,.06)"/>
                   <line x1="0" y1="82" x2="320" y2="82" stroke="rgba(255,255,255,.06)"/>
                   <path id="trendArea" fill="url(#trendFill)" d=""/>
-                  <path id="trendLine" fill="none" stroke="#EF4444" stroke-width="2.5" d=""/>
+                  <path id="trendLine" fill="none" stroke="#D64545" stroke-width="2.5" d=""/>
                 </svg>
                 <div class="trend-labels" id="trendLabels"></div>
               </div>
@@ -223,8 +223,83 @@
               <span>Send SMS Alert</span>
             </button>
           </div>
-          <p class="control-note" id="controlNote">Authorized for ASDMA &amp; district controllers</p>
+          <p class="control-note" id="controlNote">Authorized for ASDMA and district controllers</p>
           <ul class="broadcast-log" id="broadcastLog"></ul>
+        </article>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="view" id="view-admin" data-view="admin" aria-label="Administrator panel" hidden>
+        <div class="admin-banner card">
+          <div>
+            <p class="card-label">ASDMA Control Desk</p>
+            <h2 class="admin-title">Administrator Panel</h2>
+            <p class="meta">Thresholds, sensors, duty officers, and broadcast records for BHOOMI CHETNA.</p>
+          </div>
+          <div class="admin-operator">
+            <label for="operatorSelect">Signed in as</label>
+            <select id="operatorSelect" aria-label="Duty operator"></select>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <article class="card">
+            <p class="card-label">Alert Thresholds</p>
+            <form class="admin-form" id="thresholdForm">
+              <label>High risk score ≥ <input type="number" id="thrHigh" min="1" max="99" required /></label>
+              <label>Watch score ≥ <input type="number" id="thrWatch" min="1" max="98" required /></label>
+              <label>Rainfall alert (mm / 24h) <input type="number" id="thrRain" min="1" max="300" required /></label>
+              <label>Soil moisture alert (%) <input type="number" id="thrSoil" min="1" max="100" required /></label>
+              <button type="submit" class="btn solid">Save Thresholds</button>
+            </form>
+            <p class="meta" id="thresholdNote"></p>
+          </article>
+
+          <article class="card">
+            <p class="card-label">Sensor Maintenance</p>
+            <div class="admin-sensor-list" id="adminSensorList"></div>
+            <p class="meta">Toggle maintenance to take a node offline without deleting it from the district roster.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <p class="card-label">Duty Officers</p>
+              <span class="count-pill soft" id="officerCount"></span>
+            </div>
+            <form class="officer-form" id="officerForm">
+              <input type="text" id="officerName" placeholder="Full name" required maxlength="48" />
+              <input type="text" id="officerRole" placeholder="Role" required maxlength="40" />
+              <button type="submit" class="btn solid">Add</button>
+            </form>
+            <ul class="officer-list" id="officerList"></ul>
+          </article>
+
+          <article class="card">
+            <p class="card-label">System Controls</p>
+            <div class="toggle-row">
+              <div>
+                <strong>Auto SMS on high risk</strong>
+                <p class="meta">Queue advisory SMS when a district crosses the high-risk band.</p>
+              </div>
+              <button type="button" class="toggle" id="autoSmsToggle" aria-pressed="false">Off</button>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <strong>Community siren arming</strong>
+                <p class="meta">Allow district controllers to arm sirens from Relief.</p>
+              </div>
+              <button type="button" class="toggle on" id="sirenArmToggle" aria-pressed="true">On</button>
+            </div>
+            <button type="button" class="btn ghost wide" id="resetAdminBtn">Reset admin settings</button>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card-head">
+            <p class="card-label">Broadcast Archive</p>
+            <button type="button" class="text-btn" id="clearArchiveBtn">Clear archive</button>
+          </div>
+          <ul class="broadcast-log" id="adminBroadcastLog"></ul>
         </article>
       </section>
     </main>
@@ -245,6 +320,10 @@
       <button class="tab" type="button" data-nav="relief">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V6.5L12 4l7 2.5V19"/><path d="M9 19v-6h6v6"/></svg>
         <span>Relief</span>
+      </button>
+      <button class="tab" type="button" data-nav="admin">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c0 .6.4 1.2 1 1.5h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+        <span>Admin</span>
       </button>
     </nav>
   </div>
