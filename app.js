@@ -221,7 +221,12 @@ function mapMarkup(d, canvasId) {
 
   const riskEllipses = d.zones
     .map((z) => {
-      const fill = z.tone === "red" ? "url(#riskRed)" : z.tone === "amber" ? "url(#riskAmber)" : "url(#riskGreen)";
+      const fill =
+        z.tone === "red"
+          ? `url(#riskRed-${canvasId})`
+          : z.tone === "amber"
+            ? `url(#riskAmber-${canvasId})`
+            : `url(#riskGreen-${canvasId})`;
       return `<ellipse class="zone zone-${z.tone}" cx="${z.x}" cy="${z.y}" rx="42" ry="30" fill="${fill}"/>`;
     })
     .join("");
@@ -238,13 +243,13 @@ function mapMarkup(d, canvasId) {
         <linearGradient id="hillB-${canvasId}" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#243B4A"/><stop offset="100%" stop-color="#142230"/>
         </linearGradient>
-        <radialGradient id="riskRed" cx="50%" cy="50%" r="50%">
+        <radialGradient id="riskRed-${canvasId}" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".72"/><stop offset="100%" stop-color="#FF4D4D" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="riskAmber" cx="50%" cy="50%" r="50%">
+        <radialGradient id="riskAmber-${canvasId}" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stop-color="#F5C542" stop-opacity=".58"/><stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="riskGreen" cx="50%" cy="50%" r="50%">
+        <radialGradient id="riskGreen-${canvasId}" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stop-color="#3ECF8E" stop-opacity=".48"/><stop offset="100%" stop-color="#3ECF8E" stop-opacity="0"/>
         </radialGradient>
         <pattern id="grid-${canvasId}" width="24" height="24" patternUnits="userSpaceOnUse">
