@@ -296,13 +296,13 @@ function mapMarkup(d, canvasId) {
           <stop offset="0%" stop-color="#243B4A"/><stop offset="100%" stop-color="#142230"/>
         </linearGradient>
         <radialGradient id="riskRed-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#D64545" stop-opacity=".55"/><stop offset="100%" stop-color="#D64545" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#D64545" stop-opacity=".22"/><stop offset="100%" stop-color="#D64545" stop-opacity="0"/>
         </radialGradient>
         <radialGradient id="riskAmber-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#C9962A" stop-opacity=".45"/><stop offset="100%" stop-color="#C9962A" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#C9962A" stop-opacity=".18"/><stop offset="100%" stop-color="#C9962A" stop-opacity="0"/>
         </radialGradient>
         <radialGradient id="riskGreen-${canvasId}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#2F9E6B" stop-opacity=".35"/><stop offset="100%" stop-color="#2F9E6B" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#2F9E6B" stop-opacity=".14"/><stop offset="100%" stop-color="#2F9E6B" stop-opacity="0"/>
         </radialGradient>
         <pattern id="grid-${canvasId}" width="24" height="24" patternUnits="userSpaceOnUse">
           <path d="M24 0H0V24" fill="none" stroke="rgba(120,160,200,.08)" stroke-width="1"/>
@@ -312,11 +312,11 @@ function mapMarkup(d, canvasId) {
       <rect width="360" height="280" fill="url(#grid-${canvasId})"/>
       <path d="M0 190 C40 150 70 140 110 155 C150 170 170 130 210 125 C250 120 280 145 320 135 C340 130 355 140 360 145 V280 H0 Z" fill="url(#hillB-${canvasId})"/>
       <path d="M0 220 C55 185 95 200 140 195 C190 190 220 160 270 170 C300 176 330 165 360 175 V280 H0 Z" fill="url(#hillA-${canvasId})"/>
-      <path d="M40 280 C70 240 90 220 130 200 C170 180 200 190 230 170 C260 150 290 140 340 110" fill="none" stroke="#3BA4C8" stroke-opacity=".35" stroke-width="3"/>
+      <path d="M40 280 C70 240 90 220 130 200 C170 180 200 190 230 170 C260 150 290 140 340 110" fill="none" stroke="#3BA4C8" stroke-opacity=".22" stroke-width="2"/>
       <g class="zones layer-risk">${riskEllipses}</g>
       <g class="routes layer-routes" opacity="0">${routePaths}</g>
       <g class="sensors layer-sensors">${sensorPins}</g>
-      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.06em">ASSAM · SCHEMATIC MAP (DEMO)</text>
+      <text x="20" y="34" fill="#8BA0B8" font-size="10" font-family="IBM Plex Sans, sans-serif" letter-spacing="0.04em">ASSAM · DISTRICT SCHEMATIC</text>
       <text x="20" y="52" fill="#E6EBF2" font-size="14" font-family="Barlow, IBM Plex Sans, sans-serif" font-weight="700">${d.name}</text>
     </svg>
     <div class="map-legend">
@@ -385,8 +385,7 @@ function renderTrend() {
   $("#trendArea").setAttribute("d", area);
   const color = riskColor(values.at(-1));
   $("#trendLine").setAttribute("stroke", color);
-  const stop0 = $("#trendFill stop");
-  if (stop0) stop0.setAttribute("stop-color", color);
+  $("#trendArea").setAttribute("fill", color === "#d64545" ? "rgba(214,69,69,.12)" : color === "#c9962a" ? "rgba(201,150,42,.12)" : "rgba(47,158,107,.12)");
 
   if (state.trendRange === "7d") {
     $("#trendLabels").innerHTML = "<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Today</span>";
@@ -415,7 +414,7 @@ function renderHome() {
         : `STABLE · ${d.name}`;
   const alertCopy =
     lvl.cls === "high"
-      ? `Model indicates rising slope failure probability. Evacuate ${top.title}.`
+      ? `Slope assessment shows rising failure probability. Evacuate ${top.title}.`
       : lvl.cls === "watch"
         ? `Soil saturation is elevating cut-slope risk near ${top.title}. Restrict hill traffic.`
         : `No critical slope movement recorded. Continue routine sensor checks.`;
@@ -437,8 +436,14 @@ function renderHome() {
   }
 
   $("#scoreValue").textContent = Math.round(d.score);
-  $("#scoreRing").style.setProperty("--p", d.score);
-  $("#scoreRing").style.background = `radial-gradient(closest-side, var(--surface) 74%, transparent 75% 100%), conic-gradient(${riskColor(d.score)} calc(${d.score} * 1%), #2a3340 0)`;
+  const scoreFill = $("#scoreFill");
+  if (scoreFill) {
+    scoreFill.style.width = `${d.score}%`;
+    scoreFill.style.background = riskColor(d.score);
+  }
+  $("#scoreRing")?.classList.toggle("tone-high", lvl.cls === "high");
+  $("#scoreRing")?.classList.toggle("tone-watch", lvl.cls === "watch");
+  $("#scoreRing")?.classList.toggle("tone-safe", lvl.cls === "safe");
   $("#riskLevel").textContent = lvl.level;
   $("#riskLevel").className = `level ${lvl.cls}`;
   $("#riskMeta").textContent = `Confidence ${d.confidence}% · ${formatUpdated(state.updatedAt)}`;
