@@ -825,8 +825,29 @@ button, select { font: inherit; color: inherit; }
   transition: width 0.4s ease;
 }
 
-.pred-bar span.watch { background: var(--watch); }
-.pred-bar span.safe { background: var(--safe); }
+.ai-drivers {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.ai-drivers li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.ai-drivers strong {
+  color: var(--text);
+  font-weight: 600;
+}
 
 .live-tag {
   display: inline-flex;

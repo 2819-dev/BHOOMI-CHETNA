@@ -1,25 +1,23 @@
 # BHOOMI CHETNA
 
-Landslide early warning console for Assam State Disaster Management Authority (ASDMA).
+AI-powered landslide early warning console for Assam State Disaster Management Authority (ASDMA).
 
-## Live data
+## What is live
 
-- **Maps** — real OpenStreetMap tiles (Leaflet) for Guwahati Hills, Dima Hasao, Cachar, and Karbi Anglong
-- **Rainfall & soil moisture** — live Open-Meteo for each district; risk score is computed from those readings against admin thresholds
-- **Geotech sensors** (incline, pore pressure, etc.) — marked awaiting ASDMA field feed until you connect your sensor API
-- **Siren / SMS** — commands are queued in-app; wire ASDMA carrier / siren endpoints for field actuation
+- **Maps** — OpenStreetMap (Leaflet) for Guwahati Hills, Dima Hasao, Cachar, Karbi Anglong
+- **Weather** — Open-Meteo rainfall + soil moisture (refreshes automatically)
+- **AI slope prediction** — on-device ensemble classifier over live features (rain, soil, trend, terrain, zone pressure). Always runs; no fake random demo output
+- **Optional LLM narrative** — Netlify function `/api/predict` enriches the outlook when `GROQ_API_KEY` or `OPENAI_API_KEY` is set in Netlify env
+- **Auth** — owner master PIN + controller ID/PIN accounts (no public demo login)
 
-## Access
+## Geotech / broadcast
 
-- **Owner** — private master PIN (hash-verified; plaintext never shipped)
-- **Controllers** — ID + PIN accounts created by the owner in Admin
+Incline and pore-pressure nodes stay marked **awaiting ASDMA feed** until a sensor API is connected. Siren/SMS commands are queued for dispatch until carrier/hardware endpoints are wired.
 
-## Includes
+## Netlify
 
-- Live district hazard map with risk, sensor, and route layers
-- Threshold-based landslide risk scoring from live weather
-- Sensor panel (live weather nodes + pending geotech)
-- Evacuation routes and shelters with OSM directions
-- Authenticated admin for thresholds, roster, accounts, and broadcast archive
+Publish the repo root. Functions directory: `netlify/functions`.
 
-Netlify publishes the repository root.
+Optional env for LLM text:
+
+- `GROQ_API_KEY` (preferred free-tier path) or `OPENAI_API_KEY`

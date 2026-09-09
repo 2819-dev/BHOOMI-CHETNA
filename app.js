@@ -280,18 +280,9 @@ function buildLive(key, weather) {
     };
   });
 
-  let predHeadline;
-  let predMeta;
-  if (lvl.cls === "high") {
-    predHeadline = `High rainfall and soil load on ${zones[0].title}`;
-    predMeta = `24h rain ${Math.round(rain24)} mm · soil ${soilPct}% · thresholds ${rainThr} mm / ${soilThr}%`;
-  } else if (lvl.cls === "watch") {
-    predHeadline = "Soil saturation elevating cut-slope risk";
-    predMeta = `Escalate if 24h rainfall exceeds ${rainThr} mm`;
-  } else {
-    predHeadline = "No critical rainfall–soil trigger";
-    predMeta = `Next weather refresh in a few minutes`;
-  }
+  let predHeadline = "Running slope AI on live weather…";
+  let predMeta = "Waiting for model output";
+  let ai = null;
 
   return {
     key,
@@ -307,6 +298,8 @@ function buildLive(key, weather) {
     trend30: weather?.trend30 ?? Array(30).fill(Math.round(score * 0.75)),
     predHeadline,
     predMeta,
+    ai,
+    hazardBias: base.hazardBias,
     zones,
     sensors,
     route: base.route,
@@ -413,6 +406,78 @@ async function fetchDistrictWeather(key) {
   return weather;
 }
 
+function aiPayloadFromLive(d) {
+  return {
+    district: d.key,
+    districtName: d.name,
+    rain24: d.rain,
+    soilPct: d.soil,
+    rainThreshold: d.rainThreshold,
+    soilThreshold: state.admin.soilThreshold,
+    hazardBias: d.hazardBias,
+    rainSeries: d.rainSeries,
+    zones: d.zones.map((z) => ({ id: z.id, title: z.title, bias: z.bias, score: z.score })),
+  };
+}
+
+function applyAiResult(ai) {
+  if (!state.live || !ai) return;
+  state.live.ai = ai;
+  state.live.predHeadline = ai.headline;
+  state.live.predMeta = `${ai.failureWindow} · confidence ${ai.confidence}%`;
+  // Blend model score with weather score for display consistency
+  state.live.score = Math.round(0.55 * ai.score + 0.45 * state.live.score);
+  state.live.zones = state.live.zones.map((z) => {
+    const zScore = Math.min(99, Math.max(5, state.live.score + Math.round((z.bias || 0) * 0.35)));
+    const zLvl = levelFromScore(zScore);
+    return {
+      ...z,
+      score: zScore,
+      tone: zLvl.cls === "high" ? "red" : zLvl.cls === "watch" ? "amber" : "green",
+      action: zoneAction(zScore, z),
+    };
+  });
+  renderHome();
+  renderMaps();
+  renderSensors();
+  buildNotifications();
+  renderNotifications();
+}
+
+async function requestAiPrediction() {
+  if (!state.live) return;
+  const payload = aiPayloadFromLive(state.live);
+  const badge = $("#aiBadge");
+  if (badge) badge.textContent = "AI · running";
+
+  // Always compute local AI first so the console never waits on a dead endpoint
+  let local = null;
+  if (typeof runSlopeAI === "function") {
+    local = runSlopeAI(payload);
+    applyAiResult(local);
+    if (badge) badge.textContent = `AI · ${local.confidence}%`;
+  }
+
+  try {
+    const res = await fetch("/api/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`predict HTTP ${res.status}`);
+    const remote = await res.json();
+    if (remote?.ok) {
+      applyAiResult(remote);
+      if (badge) {
+        badge.textContent = remote.llm ? `AI · LLM ${remote.confidence}%` : `AI · ${remote.confidence}%`;
+      }
+    }
+  } catch {
+    // Local model already applied; Netlify function may be unavailable in plain static hosting
+    if (badge && local) badge.textContent = `AI · ${local.confidence}%`;
+  }
+}
+
 async function refreshWeather(showToast) {
   setFeedStatus("connecting");
   try {
@@ -428,12 +493,14 @@ async function refreshWeather(showToast) {
     state.lastRiskClass = lvl.cls;
     buildNotifications();
     renderAll();
-    if (showToast) toast(`Live weather loaded for ${state.live.name}`);
+    await requestAiPrediction();
+    if (showToast) toast(`Live weather + AI loaded for ${state.live.name}`);
   } catch (err) {
     console.error(err);
     setFeedStatus("error");
     if (!state.live) state.live = buildLive(state.district, weatherCache[state.district] || null);
     renderAll();
+    await requestAiPrediction();
     toast("Weather feed unavailable — retrying");
   }
 }
@@ -617,7 +684,25 @@ function renderHome() {
   $("#predMeta").textContent = d.predMeta;
   const predFill = $("#predBarFill");
   predFill.style.width = `${d.score}%`;
-  predFill.className = lvl.cls === "high" ? "" : lvl.cls;
+  const predLvl = levelFromScore(d.score);
+  predFill.className = predLvl.cls === "high" ? "" : predLvl.cls;
+
+  const drivers = $("#aiDrivers");
+  if (drivers) {
+    if (d.ai?.drivers?.length) {
+      drivers.innerHTML = d.ai.drivers
+        .map((dr) => `<li><span>${dr.label}</span><strong>${dr.impact > 0 ? "+" : ""}${dr.impact}</strong></li>`)
+        .join("");
+    } else {
+      drivers.innerHTML = "";
+    }
+  }
+  const aiAction = $("#aiAction");
+  if (aiAction) {
+    aiAction.textContent = d.ai?.action
+      ? `Action: ${d.ai.action}${d.ai.llm ? " · LLM narrative" : " · on-device AI"}`
+      : "";
+  }
 
   $("#rainValue").textContent = Math.round(d.rain);
   $("#rainChart").innerHTML = d.rainSeries

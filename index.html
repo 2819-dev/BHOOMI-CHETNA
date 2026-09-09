@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1017" />
-  <meta name="description" content="BHOOMI CHETNA landslide early warning system for Assam State Disaster Management Authority." />
-  <title>BHOOMI CHETNA | Landslide Early Warning</title>
+  <meta name="description" content="BHOOMI CHETNA — AI-powered landslide early warning for Assam (ASDMA) with live weather and real district maps." />
+  <title>BHOOMI CHETNA | AI Landslide Early Warning</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -104,10 +104,15 @@
             </article>
 
             <article class="card pred-card">
-              <p class="card-label">Slope Outlook</p>
-              <p class="pred-headline" id="predHeadline">Slope instability rising</p>
-              <p class="meta" id="predMeta">Estimated failure window: 6 to 12 hours</p>
-              <div class="pred-bar"><span id="predBarFill" style="width:78%"></span></div>
+              <div class="card-head">
+                <p class="card-label">AI Slope Prediction</p>
+                <span class="count-pill soft" id="aiBadge">AI</span>
+              </div>
+              <p class="pred-headline" id="predHeadline">Running slope AI on live weather…</p>
+              <p class="meta" id="predMeta">Waiting for live rainfall and soil moisture</p>
+              <div class="pred-bar"><span id="predBarFill" style="width:0%"></span></div>
+              <ul class="ai-drivers" id="aiDrivers"></ul>
+              <p class="meta" id="aiAction"></p>
             </article>
 
             <div class="grid-2">
@@ -406,6 +411,7 @@
 
   <div class="toast" id="toast" hidden></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="ai-model.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
